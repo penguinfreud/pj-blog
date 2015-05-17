@@ -1,5 +1,5 @@
 var view = require("../server/view"),
-lib = require("./lib");
+    lib = view.require("lib");
 
 exports.run = View(req) {
     var blog = req.blog, i, l;

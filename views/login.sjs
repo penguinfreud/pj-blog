@@ -1,4 +1,5 @@
-var lib = require("./lib");
+var view = require("../server/view"),
+    lib = view.require("lib");
 
 exports.run = View(message) {
     html {

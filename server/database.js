@@ -43,7 +43,7 @@ exports.getBlogs = function (hasContent, count) {
             start = 0;
         }
         
-        conn.query("select id, title" +
+        conn.query("select id, uid, title" +
             (hasContent? ", substr(content, 0, 250)": "") +
             ", created_time, category, read_count, like_count, comment_count from blogs where uid=? limit ? offset ?",
         [req.params.uid, count, start], function (err, rows) {

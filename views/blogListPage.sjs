@@ -1,10 +1,5 @@
 var view = require("../server/view"),
-lib = require("./lib");
-
-var hasPrivil = function (req) {
-    return req.session.user.id === req.user.id? 1:
-        req.session.user.type === 2? 2: 0;
-};
+    lib = view.require("lib");
 
 exports.run = View(req) {
     var path = '/blog/' + req.user.id;
@@ -33,20 +28,8 @@ exports.run = View(req) {
                                     span.blog_timestamp {
                                         @lib.formatTime(blogs[i].created_time);
                                     }
-                                    @' ';
-                                    if (hasPrivil(req)) {
-                                        span.blog_operations {
-                                            if (hasPrivil(req) === 1) {
-                                                a.edit_blog (href='/edit/' + blogs[i].id) {
-                                                    @'编辑';
-                                                }
-                                                @' ';
-                                            }
-                                            a.delete_blog (href='/delete/' + blogs[i].id +
-                                                    '?goto=' + path + '/blog_list') {
-                                                @'删除';
-                                            }
-                                        }
+                                    span.blog_operations {
+                                        lib.blogOperations(req, blogs[i], ' ');
                                     }
                                 }
                             }

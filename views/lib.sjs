@@ -42,3 +42,24 @@ exports.unprocessContent = function (content) {
         content.substring(3, content.length - 4)
             .replace(/<\/p><p>/g, "\n"));
 };
+
+var hasPrivil = function (req) {
+    return req.session.user.id === req.user.id? 1:
+        req.session.user.type === 2? 2: 0;
+};
+
+exports.blogOperations = View(req, blog, separator) {
+    if (hasPrivil(req)) {
+        @separator;
+        if (hasPrivil(req) === 1) {
+            a.edit_blog (href='/edit/' + blog.id) {
+                @'编辑';
+            }
+            @separator;
+        }
+        a.delete_blog (href='/delete/' + blog.id +
+                '?goto=/blog/' + req.user.id + '/blog_list') {
+            @'删除';
+        }
+    }
+};

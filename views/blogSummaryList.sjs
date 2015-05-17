@@ -8,7 +8,9 @@ exports.run = View(req) {
         div.panel_content {
             var b = req.blogs, i, l = b.length;
             for (i = 0; i<l; i++) {
-                @view.render("blogSummary", req, b[i]);
+                div.blog {
+                    @view.render("blogSummary", req, b[i], false);
+                }
             }
         }
     }
