@@ -89,6 +89,8 @@ app.get("/edit", ifLogged, getCategories2, function (req, res, next) {
 app.get("/edit/:blog_id", ifLogged,
     [db.getSingleBlog, getCategories2],
     function (req, res, next) {
+        req.user = req.session.user;
+        console.log(req.blog);
         res.send(view.render("edit", req));
     });
 

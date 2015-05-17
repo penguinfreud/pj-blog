@@ -2,14 +2,14 @@ var view = require("../server/view"),
 lib = require("./lib");
 
 exports.run = View(req) {
-    var blog = req.blog;
+    var blog = req.blog, i, l;
     var body = @{
         @lib.style('/css/edit.css');
         @lib.script('/scripts/jquery-2.1.4.min.js');
         @lib.script('/scripts/edit.js');
         div#edit_blog.panel {
             div.panel_title {
-                @blog? '编辑 ' + blog.title: '发博文';
+                @blog? '编辑': '发博文';
             }
             div.panel_content {
                 form#edit_form (action='/edit', method='POST') {
@@ -25,9 +25,11 @@ exports.run = View(req) {
                     br;
                     @'分类：';
                     select (name='category') {
-                        var c = req.categories, i, l = c.length, selected;
-                        for (i = 0; i<l; i++) {
-                            ## selected = blog? i === blog.category: i === 0;
+                        var c = req.categories, selected;
+                        for (i = 0, l = c.length; i<l; i++) {
+                            ## {
+                                selected = blog? c[i].id === blog.category: i === 0;
+                            }
                             option (value=c[i].id, selected? 'selected': '') {
                                 @c[i].name;
                             }
@@ -50,7 +52,15 @@ exports.run = View(req) {
                     p {
                         @'标签：';
                         span.small { @'（空格分隔）'; }
-                        input (type='text', name='tags', value=blog? blog.tags.join(' '): '');
+                        ## {
+                            if (blog) {
+                                var sTags = [], tags = blog.tags;
+                                for (i = 0, l = tags.length; i<l; i++) {
+                                    sTags.push(tags[i].name);
+                                }
+                            }
+                        }
+                        input (type='text', name='tags', value=blog? sTags.join(' '): '');
                     }
                     p {
                         input.button (type='submit', value='发博文');
@@ -60,7 +70,7 @@ exports.run = View(req) {
         }
     };
     return view.render("layout", req, {
-        title: '发博文',
+        title: blog? '编辑 ' + blog.title: '发博文',
         body: body
     });
 };

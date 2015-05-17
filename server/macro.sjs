@@ -84,7 +84,6 @@ macro stmt {
         return $x ... ;
     }
     rule { ## { $x ... } } => { { $x ... } }
-    rule { ## $x } => { $x }
 }
 
 macro tagName {

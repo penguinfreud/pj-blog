@@ -1,4 +1,5 @@
-var view = require("../server/view");
+var view = require("../server/view"),
+lib = require("./lib");
 
 var hasPrivil = function (req) {
     return req.session.user.id === req.user.id? 1:
@@ -30,14 +31,16 @@ exports.run = View(req) {
                                 }
                                 span.align_right {
                                     span.blog_timestamp {
-                                        @blogs[i].created_time.toLocaleString();
+                                        @lib.formatTime(blogs[i].created_time);
                                     }
+                                    @' ';
                                     if (hasPrivil(req)) {
                                         span.blog_operations {
                                             if (hasPrivil(req) === 1) {
                                                 a.edit_blog (href='/edit/' + blogs[i].id) {
                                                     @'编辑';
                                                 }
+                                                @' ';
                                             }
                                             a.delete_blog (href='/delete/' + blogs[i].id +
                                                     '?goto=' + path + '/blog_list') {
