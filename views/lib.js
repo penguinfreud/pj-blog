@@ -28,3 +28,17 @@ exports.formatTime = function (date) {
         date.getMinutes(), ":",
         date.getSeconds()].join("");
 };
+
+exports.unescapeHTML = function (str) {
+    return str.replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">");
+};
+
+exports.unprocessContent = function (content) {
+    return exports.unescapeHTML(
+        content.substring(3, content.length - 4)
+            .replace(/<\/p><p>/g, "\n"));
+};

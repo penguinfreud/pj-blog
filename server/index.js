@@ -1,7 +1,6 @@
 var express = require("express"),
 session = require("cookie-session"),
 view = require("./view"),
-defer = require("../lib/defer"),
 db = require("./database");
 
 process.on("uncaughtException", function (err) {
@@ -51,6 +50,10 @@ var getCategories2 = function (req, res, next) {
     db.getCategories(req.session.user.id, req, res, next);
 };
 
+app.get("/blog", function (req, res, next) {
+    res.redirect("/");
+});
+
 app.get("/blog/:uid",
     [db.getUser,
     db.getBlogs(1, 10),
@@ -90,11 +93,16 @@ app.get("/edit/:blog_id", ifLogged,
     [db.getSingleBlog, getCategories2],
     function (req, res, next) {
         req.user = req.session.user;
-        console.log(req.blog);
         res.send(view.render("edit", req));
     });
 
-app.post("/edit", ifLogged, bodyParser, db.postBlog, function (req, res, next) {
+app.post("/edit", ifLogged, bodyParser, function (req, res, next) {
+    if (req.body.id) {
+        db.editBlog(req, res, next);
+    } else {
+        db.postBlog(req, res, next);
+    }
+}, function (req, res, next) {
     res.redirect("/blog/" + req.uid + "/entry/" + req.blogId);
 });
 

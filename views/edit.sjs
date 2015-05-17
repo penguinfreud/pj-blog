@@ -13,13 +13,16 @@ exports.run = View(req) {
             }
             div.panel_content {
                 form#edit_form (action='/edit', method='POST') {
+                    if (blog) {
+                        input (type='hidden', name='id', value=blog.id);
+                    }
                     @'标题：';
                     br;
-                    input (type='text', name='title', value=blog? blog.title: '');
+                    input (type='text', name='title', value=blog? lib.unescapeHTML(blog.title): '');
                     br;
                     textarea (name='content') {
                         if (blog) {
-                            @blog.content;
+                            @lib.unprocessContent(blog.content);
                         }
                     }
                     br;
@@ -56,14 +59,14 @@ exports.run = View(req) {
                             if (blog) {
                                 var sTags = [], tags = blog.tags;
                                 for (i = 0, l = tags.length; i<l; i++) {
-                                    sTags.push(tags[i].name);
+                                    sTags.push(lib.unescapeHTML(tags[i].name));
                                 }
                             }
                         }
                         input (type='text', name='tags', value=blog? sTags.join(' '): '');
                     }
                     p {
-                        input.button (type='submit', value='发博文');
+                        input.button (type='submit', value=blog? '保存': '发博文');
                     }
                 }
             }
