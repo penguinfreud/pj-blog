@@ -1,14 +1,14 @@
-var lib = view.require("./lib");
+var lib = require("./lib");
 
 exports.run = View(message) {
     html {
         head {
             @lib.title('登录');
-            @lib.style('css/login.css');
-            @lib.style('css/ui.css');
-            @lib.script('scripts/jquery-2.1.4.min.js');
-            @lib.script('scripts/cookie.js');
-            @lib.script('scripts/login.js');
+            @lib.style('/css/login.css');
+            @lib.style('/css/ui.css');
+            @lib.script('/scripts/jquery-2.1.4.min.js');
+            @lib.script('/scripts/cookie.js');
+            @lib.script('/scripts/login.js');
         }
         body {
             div#logo_wrapper {

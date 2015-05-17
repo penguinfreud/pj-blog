@@ -25,20 +25,18 @@ app.use(session({
 
 app.use(express.static(__dirname + "/../public"));
 
-var loginCheck = function (req, res, next) {
+app.get("/", app.get("loginCheck"), function (req, res, next) {
     res.redirect("/login");
-};
-
-app.get("/", app.get("loginCheck"), loginCheck);
+});
 
 var getCategories = function (req, res, next) {
-    db.getCategories(req.params.id, req, next);
+    db.getCategories(req.params.uid, req, res, next);
 };
 
 app.get("/blog/:uid",
     [db.getUser,
     db.getBlogs(1, 10),
-    db.getCategories],
+    getCategories],
 function (req, res, next) {
     res.send(view.render("index", req));
 });
@@ -50,7 +48,7 @@ app.get("/blog/:uid/category/:category_id", function (req, res, next) {
 app.get("/blog/:uid/blog_list",
     [db.getUser,
     db.getBlogs(0, 20),
-    db.getCategories],
+    getCategories],
 function (req, res, next) {
     res.send(view.render("blogListPage", req));
 });
@@ -63,7 +61,16 @@ app.get("/blog/:uid/tag/:tag_id", function (req, res, next) {
     res.send("tag " + req.params.blog_id);
 });
 
-app.get("/blog/:uid/edit", loginCheck, function (req, res, next) {
+app.get("/edit", function (req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect("/login");
+    }
+}, function (req, res, next) {
+    db.getCategories(req.session.user.id, req, res, next);
+}, function (req, res, next) {
+    req.user = req.session.user;
     res.send(view.render("edit", req));
 });
 

@@ -3,14 +3,15 @@ var lib = require("./lib");
 exports.run = View(req, data) {
     ## {
         var path = '/blog/' + req.user.id,
-            title = req.user.nickname + '的博客';
+            title = req.user.nickname + '的博客',
+            pageTitle = title;
         if (data.title) {
-            title = data.title + " - " + title;
+            pageTitle = data.title + " - " + pageTitle;
         }
     }
     html {
         head {
-            @lib.title(title);
+            @lib.title(pageTitle);
             @lib.style('/css/ui.css');
             @lib.style('/css/main.css');
         }
@@ -56,18 +57,7 @@ exports.run = View(req, data) {
                 }
             }
             div#body {
-                if (data.nav === 1) {
-                    a#post_blog.align_right (href=path + '/edit') {
-                        @'发博文';
-                    }
-                    div.clear {}
-                }
-                div#body_left {
-                    @data.bodyLeft;
-                }
-                div#body_right {
-                    @data.bodyRight;
-                }
+                @data.body;
             }
             div#footer {
                 p { @'Copyright &copy; 2015 ' + req.user.nickname; }

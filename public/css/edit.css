@@ -1,9 +1,9 @@
-#blog-title-input {
+input[name="title"] {
     width: 100%;
     margin: 12px 0;
 }
 
-#blog-content-input {
+textarea[name="content"] {
     width: 100%;
     max-width: 100%;
     min-height: 20em;
@@ -11,11 +11,6 @@
     margin-bottom: 12px;
 }
 
-#blog-tags-input {
+input[name="tags"] {
     width: 50%;
-}
-
-#blog-post-button {
-    padding: 2px 16px;
-    margin: 16px 0;
 }

@@ -80,7 +80,7 @@ var getBlogTags = function (context) {
     };
 };
 
-exports.getCategories = function (req, res, next) {
+exports.getCategories = function (uid, req, res, next) {
     conn.query("select * from categories where uid=?",
-    [req.params.uid], $cb(req, "categories", next));
+    [uid], $cb(req, "categories", next));
 };
