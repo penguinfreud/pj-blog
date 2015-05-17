@@ -1,0 +1,56 @@
+.blog-comments, .blog-post-comment {
+    margin: 16px 0;
+}
+
+.blog-comments h3, .blog-post-comment h3 {
+    background-color: #eee;
+    font-size: 0.9em;
+    padding: 4px 8px;
+    font-weight: normal;
+}
+
+.blog-post-comment textarea {
+    width: 100%;
+    min-height: 10em;
+    overflow-y: scroll;
+}
+
+.blog-post-comment button {
+    padding: 2px 16px;
+    margin: 16px 0;
+}
+
+.comment {
+    padding: 20px;
+    border-top: 1px dotted #ccc;
+}
+
+.comment.first {
+    border-top: none;
+}
+
+.comment-bottom {
+    font-size: 0.9em;
+    line-height: 2;
+}
+
+.comment-timestamp {
+    color: #666;
+}
+
+.comment-operations {
+    float: right;
+}
+
+.blog-nav-prev {
+    display: inline-block;
+    float: left;
+    text-align: left;
+}
+
+.blog-nav-next {
+    display: inline-block;
+    float: right;
+    text-align: right;
+}
+

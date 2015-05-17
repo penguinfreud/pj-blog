@@ -1,0 +1,86 @@
+#input_container, #logo_wrapper {
+    width: 700px;
+    margin: 4px auto;
+}
+
+#input_container {
+    border: 1px solid #ccc;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+#input_container > div {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.inputs {
+    width: 23em;
+    margin: 24px auto;
+    line-height: 2;
+}
+
+.inputs label {
+    display: inline-block;
+    width: 6em;
+}
+
+.inputs input {
+    width: 15em;
+    font-size: 1.1em;
+}
+
+.buttons {
+    text-align: right;
+}
+
+a.button {
+    display: inline-block;
+    padding: 4px 16px;
+    margin: 4px;
+    text-align: center;
+    background-color: #c6c6c6;
+    text-decoration: none;
+    color: #222;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+a.button:hover {
+    background-color: #ddd;
+    color: #444;
+}
+
+#logo_wrapper {
+    margin-top: 80px;
+}
+
+#logo {
+    width: 80px;
+    height: 27px;
+    background-image: url(../pics/logo.png);
+}
+
+#login_form {
+    display: block;
+}
+
+.signup #login_form {
+    display: none;
+}
+
+#signup_form {
+    display: none;
+}
+
+.signup #signup_form {
+    display: block;
+}
+
+.small {
+    font-size: 0.8em;
+    line-height: 1;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}

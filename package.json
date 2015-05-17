@@ -1,0 +1,29 @@
+{
+"name": "pj-blog",
+"version": "0.1.0",
+"description": "A blog project for the basic web course",
+"author": {
+    "name": "Wang Shiyi"
+},
+"repository": {
+    "type": "git",
+    "url": "git://github.com/penguinfreud/pj-blog"
+},
+"main": "server/index.js",
+"files": [
+    "lib/",
+    "server/",
+    "public/",
+    "views/"
+],
+"dependencies": {
+    "body-parser": "1.12.x",
+    "cookie-session": "1.1.x",
+    "express": "4.12.x",
+    "mysql2": "0.15.x",
+    "sweet.js": "0.7.x"
+},
+"engines": {
+    "node": ">= 0.8"
+}
+}
