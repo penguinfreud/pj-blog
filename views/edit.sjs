@@ -2,27 +2,33 @@ var view = require("../server/view"),
 lib = require("./lib");
 
 exports.run = View(req) {
+    var blog = req.blog;
     var body = @{
         @lib.style('/css/edit.css');
         @lib.script('/scripts/jquery-2.1.4.min.js');
         @lib.script('/scripts/edit.js');
         div#edit_blog.panel {
             div.panel_title {
-                @'发博文';
+                @blog? '编辑 ' + blog.title: '发博文';
             }
             div.panel_content {
                 form#edit_form (action='/edit', method='POST') {
                     @'标题：';
                     br;
-                    input (type='text', name='title');
+                    input (type='text', name='title', value=blog? blog.title: '');
                     br;
-                    textarea (name='content') {}
+                    textarea (name='content') {
+                        if (blog) {
+                            @blog.content;
+                        }
+                    }
                     br;
                     @'分类：';
                     select (name='category') {
-                        var c = req.categories, i, l = c.length;
+                        var c = req.categories, i, l = c.length, selected;
                         for (i = 0; i<l; i++) {
-                            option (value=c[i].id, i === 0? 'selected': '') {
+                            ## selected = blog? i === blog.category: i === 0;
+                            option (value=c[i].id, selected? 'selected': '') {
                                 @c[i].name;
                             }
                         }
@@ -44,7 +50,7 @@ exports.run = View(req) {
                     p {
                         @'标签：';
                         span.small { @'（空格分隔）'; }
-                        input (type='text', name='tags');
+                        input (type='text', name='tags', value=blog? blog.tags.join(' '): '');
                     }
                     p {
                         input.button (type='submit', value='发博文');

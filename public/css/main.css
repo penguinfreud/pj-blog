@@ -76,10 +76,11 @@
 
 .info_intro, #categories_list, .blog_timestamp, .blog_tags, .blog_operations, #footer {
     font-size: 0.8em;
+    color: #555;
 }
 
 .blog {
-    padding: 48px 8px 12px 8px;
+    padding: 24px 8px 12px 8px;
     border-top: 1px dotted #ccc;
 }
 
@@ -90,6 +91,10 @@
 
 .blog_timestamp {
     margin-left: 1em;
+}
+
+.blog_content {
+    margin: 24px 0;
 }
 
 #footer {

@@ -1,21 +1,21 @@
-.blog-comments, .blog-post-comment {
+.blog_comments, .blog_post_comment {
     margin: 16px 0;
 }
 
-.blog-comments h3, .blog-post-comment h3 {
+.blog_comments h3, .blog_post_comment h3 {
     background-color: #eee;
     font-size: 0.9em;
     padding: 4px 8px;
     font-weight: normal;
 }
 
-.blog-post-comment textarea {
+.blog_post_comment textarea {
     width: 100%;
     min-height: 10em;
     overflow-y: scroll;
 }
 
-.blog-post-comment button {
+.blog_post_comment button {
     padding: 2px 16px;
     margin: 16px 0;
 }
@@ -29,26 +29,26 @@
     border-top: none;
 }
 
-.comment-bottom {
+.comment_bottom {
     font-size: 0.9em;
     line-height: 2;
 }
 
-.comment-timestamp {
+.comment_timestamp {
     color: #666;
 }
 
-.comment-operations {
+.comment_operations {
     float: right;
 }
 
-.blog-nav-prev {
+.blog_nav_prev {
     display: inline-block;
     float: left;
     text-align: left;
 }
 
-.blog-nav-next {
+.blog_nav_next {
     display: inline-block;
     float: right;
     text-align: right;

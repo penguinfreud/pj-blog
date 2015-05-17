@@ -1,12 +1,4 @@
-var getCategoryName = function (categories, id) {
-    var i = categories.length;
-    while (i--) {
-        if (categories[i].id === id) {
-            return categories[i].name;
-        }
-    }
-    return "";
-};
+var lib = require("./lib");
 
 exports.run = View(req, blog) {
     var path = '/blog/' + req.user.id,
@@ -17,7 +9,7 @@ exports.run = View(req, blog) {
                 @blog.title;
             }
             span.blog_timestamp {
-                @'('; @blog.created_time.toLocaleString(); @')';
+                @'('; @lib.formatTime(blog.created_time); @')';
             }
         }
         div.blog_tags {
@@ -31,10 +23,11 @@ exports.run = View(req, blog) {
                     @tags[i].name;
                 }
             }
+            @' ';
             span {
                 @'分类：';
                 a (href=path + '/category/' + blog.category) {
-                    @getCategoryName(blog.category);
+                    @lib.getCategoryName(req.categories, blog.category);
                 }
             }
         }
@@ -43,11 +36,11 @@ exports.run = View(req, blog) {
         }
         div.blog_operations {
             a (href=blogPath) {
-                @'阅读('; @blog.read_count; ')';
+                @'阅读('; @blog.read_count; @')';
             }
             @' | ';
             a (href=blogPath + '#comments') {
-                @'评论('; @blog.comment_count; ')';
+                @'评论('; @blog.comment_count; @')';
             }
             a.align_right (href=blogPath) {
                 @'查看全文&gt;&gt;';

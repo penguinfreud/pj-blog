@@ -86,8 +86,10 @@ a:hover {
     color: #dd1037;
 }
 
-input[type="text"] {
+input[type="text"], input[type="password"] {
     padding: 6px;
+    font-size: 1em;
+    margin: 8px 2px;
 }
 
 .small {

@@ -10,23 +10,27 @@ process.on("uncaughtException", function (err) {
 
 var app = express();
 
-app.set("ifUnlogged", function (req, res, next) {
+var ifUnlogged = function (req, res, next) {
     if (req.session.user) {
         res.redirect("/blog/" + req.session.user.id);
     } else {
         next();
     }
-});
+};
 
-app.set("ifLogged", function (req, res, next) {
+var ifLogged = function (req, res, next) {
     if (req.session.user) {
         next();
     } else {
         res.redirect("/login");
     }
-});
+};
 
-app.set("bodyParser", require("body-parser").urlencoded({ extended: false }));
+var bodyParser = require("body-parser").urlencoded({ extended: false });
+
+app.set("ifUnlogged", ifUnlogged);
+app.set("ifLogged", ifLogged);
+app.set("bodyParser", bodyParser);
 
 app.use(session({
     name: "s",
@@ -35,12 +39,16 @@ app.use(session({
 
 app.use(express.static(__dirname + "/../public"));
 
-app.get("/", app.get("ifUnlogged"), function (req, res, next) {
+app.get("/", ifUnlogged, function (req, res, next) {
     res.redirect("/login");
 });
 
 var getCategories = function (req, res, next) {
     db.getCategories(req.params.uid, req, res, next);
+};
+
+var getCategories2 = function (req, res, next) {
+    db.getCategories(req.session.user.id, req, res, next);
 };
 
 app.get("/blog/:uid",
@@ -63,22 +71,32 @@ function (req, res, next) {
     res.send(view.render("blogListPage", req));
 });
 
-app.get("/blog/:uid/entry/:blog_id", function (req, res, next) {
-    res.send("blog " + req.params.blog_id);
-});
+app.get("/blog/:uid/entry/:blog_id",
+    [db.getUser, db.getSingleBlog, db.getSingleCategory],
+    function (req, res, next) {
+        res.send(view.render("blog", req));
+    });
 
 app.get("/blog/:uid/tag/:tag_id", function (req, res, next) {
     res.send("tag " + req.params.blog_id);
 });
 
-app.get("/edit", app.get("ifLogged"), function (req, res, next) {
-    db.getCategories(req.session.user.id, req, res, next);
-}, function (req, res, next) {
+app.get("/edit", ifLogged, getCategories2, function (req, res, next) {
     req.user = req.session.user;
     res.send(view.render("edit", req));
 });
 
-app.post("/create_category", app.get("ifLogged"), app.get("bodyParser"), db.createCategory);
+app.get("/edit/:blog_id", ifLogged,
+    [db.getSingleBlog, getCategories2],
+    function (req, res, next) {
+        res.send(view.render("edit", req));
+    });
+
+app.post("/edit", ifLogged, bodyParser, db.postBlog, function (req, res, next) {
+    res.redirect("/blog/" + req.uid + "/entry/" + req.blogId);
+});
+
+app.post("/create_category", ifLogged, bodyParser, db.createCategory);
 
 require("./account").init(app);
 

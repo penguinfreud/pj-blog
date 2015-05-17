@@ -1,4 +1,5 @@
-var mysql = require("mysql2");
+var mysql = require("mysql2"),
+escapeHTML = require("escape-html");
 
 var conn = exports.connection = mysql.createConnection({
     user: "wsy",
@@ -42,7 +43,7 @@ exports.getBlogs = function (hasContent, count) {
             start = 0;
         }
         
-        conn.query("select title" +
+        conn.query("select id, title" +
             (hasContent? ", substr(content, 0, 250)": "") +
             ", created_time, category, read_count, like_count, comment_count from blogs where uid=? limit ? offset ?",
         [req.params.uid, count, start], function (err, rows) {
@@ -66,7 +67,7 @@ exports.getBlogs = function (hasContent, count) {
 
 var getBlogTags = function (context) {
     return function (blog) {
-        conn.query("select tags.id, tags.name from blog_tags, tags where blog_tags.tag_id=tags.id and blog_tags.blog_id=?",
+        conn.query("select tags.id, tags.name from tags where tags.blog_id=?",
         [blog.id], function (err, rows) {
             if (err) {
                 context.next(err);
@@ -100,4 +101,100 @@ exports.createCategory = function (req, res, next) {
     } else {
         res.send();
     }
+};
+
+exports.getSingleBlog = function (req, res, next) {
+    conn.query("select * from blogs where id=?",
+    [req.params.blog_id], function (err, rows) {
+        if (err) {
+            next(err);
+        } else if (rows.length === 0) {
+            res.status(404).send("Not Found");
+        } else {
+            req.blog = rows[0];
+            getBlogTags({
+                total: 1,
+                count: 0,
+                next: next
+            })(rows[0]);
+        }
+    });
+};
+
+exports.getSingleCategory = function (req, res, next) {
+    conn.query("select categories.* from categories, blogs where categories.id=blogs.category and blogs.id=?",
+    [req.params.blog_id], function (err, rows) {
+        if (err) {
+            next(err);
+        } else {
+            req.categories = rows;
+            next();
+        }
+    });
+};
+
+exports.postBlog = function (req, res, next) {
+    var uid = req.session.user.id,
+    title = escapeHTML(req.body.title),
+    content = escapeHTML(req.body.content),
+    category = req.body.category;
+    tags = escapeHTML(req.body.tags).split(/\s+/g),
+    count = 0;
+    
+    req.uid = uid;
+    
+    var f1 = function () {
+        conn.execute("insert into blogs (uid, title, content, category, created_time, last_modified) values (?, ?, ?, ?, now(), now())",
+        [uid, title, content, category], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                req.blogId = result.insertId;
+                f2(result.insertId);
+            }
+        });
+        conn.execute("update categories set blog_count=blog_count+1 where id=?",
+            [category], function (err, result) {
+                if (err) {
+                    next(err);
+                }
+            });
+    };
+    
+    var f2 = function (blogId) {
+        var i, l = tags.length;
+        if (l === 0) {
+            next();
+        } else {
+            for (i = 0; i<l; i++) {
+                conn.execute("insert into tags (blog_id, name) values (?, ?)", 
+                [blogId, tags[i]], function (err, result) {
+                    if (err) {
+                        next(err);
+                    } else if (++count === l) {
+                        next();
+                    }
+                });
+            }
+        }
+    };
+    
+    conn.query("select * from categories where uid=? and id=?",
+    [uid, category], function (err, rows) {
+        if (err) {
+            next(err);
+        } else if (rows.length === 1) {
+            f1();
+        } else {
+            conn.query("select id from categories where uid=? and name=?",
+            [uid, "默认分类"], function (err, rows) {
+                if (err) {
+                    next(err);
+                } else if (rows.length === 1) {
+                    category = rows[0].id;
+                    f1();
+                }
+            });
+        }
+    });
 };
