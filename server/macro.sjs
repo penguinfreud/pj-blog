@@ -56,7 +56,7 @@ macro stmt {
     rule {
         $name:tagName $id:tagId $class:tagClassList $attrList:attrList;
     } => {
-        output.push('<', $name $id $class $attrList , '/>');
+        output.push('<', $name $id $class $attrList , ' />');
     }
     rule {
         if $a { $b:stmt ... } else { $c:stmt ... }

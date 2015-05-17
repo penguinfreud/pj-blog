@@ -77,10 +77,3 @@ a.button:hover {
 .signup #signup_form {
     display: block;
 }
-
-.small {
-    font-size: 0.8em;
-    line-height: 1;
-    margin-top: 4px;
-    margin-bottom: 12px;
-}

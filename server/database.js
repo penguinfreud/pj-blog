@@ -84,3 +84,20 @@ exports.getCategories = function (uid, req, res, next) {
     conn.query("select * from categories where uid=?",
     [uid], $cb(req, "categories", next));
 };
+
+exports.createCategory = function (req, res, next) {
+    var name = req.body.name;
+    if (name) {
+        conn.execute("insert into categories (uid, name) values (?, ?)",
+        [req.session.user.id, name], function (err, result) {
+            if (err) {
+                console.log(e.stack);
+                res.send();
+            } else {
+                res.send(result.insertId);
+            }
+        });
+    } else {
+        res.send();
+    }
+};

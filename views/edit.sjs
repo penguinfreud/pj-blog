@@ -4,6 +4,7 @@ lib = require("./lib");
 exports.run = View(req) {
     var body = @{
         @lib.style('/css/edit.css');
+        @lib.script('/scripts/jquery-2.1.4.min.js');
         @lib.script('/scripts/edit.js');
         div#edit_blog.panel {
             div.panel_title {
@@ -27,14 +28,27 @@ exports.run = View(req) {
                         }
                     }
                     @' ';
-                    a (href='#') {
-                        @'创建分类';
+                    span#create_category_panel {
+                        input#category_input (type='text');
+                        @' ';
+                        a#create_category_ok.button (href='#') {
+                            @'确认';
+                        }
+                        a#create_category_cancel.button (href='#') {
+                            @'取消';
+                        }
+                        a#create_category_btn.button (href='#') {
+                            @'创建分类';
+                        }
                     }
-                    br;
-                    @'标签：';
-                    input (type='text', name='tags', placeholder='填写标签，让更多人看到你的博文');
-                    br;
-                    input.button (type='submit', value='发博文');
+                    p {
+                        @'标签：';
+                        span.small { @'（空格分隔）'; }
+                        input (type='text', name='tags');
+                    }
+                    p {
+                        input.button (type='submit', value='发博文');
+                    }
                 }
             }
         }

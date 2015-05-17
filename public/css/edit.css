@@ -1,9 +1,12 @@
 input[name="title"] {
+    box-sizing: border-box;
     width: 100%;
     margin: 12px 0;
+    font-size: 1.4em;
 }
 
 textarea[name="content"] {
+    box-sizing: border-box;
     width: 100%;
     max-width: 100%;
     min-height: 20em;
@@ -13,4 +16,24 @@ textarea[name="content"] {
 
 input[name="tags"] {
     width: 50%;
+}
+
+#create_category_panel #category_input,
+#create_category_panel #create_category_ok,
+#create_category_panel #create_category_cancel {
+    display: none;
+}
+
+#create_category_panel.visible #category_input,
+#create_category_panel.visible #create_category_ok,
+#create_category_panel.visible #create_category_cancel {
+    display: inline-block;
+}
+
+#create_category_panel #create_category_btn {
+    display: inline-block;
+}
+
+#create_category_panel.visible #create_category_btn {
+    display: none;
 }

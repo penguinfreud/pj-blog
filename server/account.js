@@ -2,13 +2,11 @@ var view = require("./view"),
 db = require("./database");
 
 exports.init = function (app) {
-    var bodyParser = require("body-parser").urlencoded({ extended: false });
-    
-    app.get("/login", app.get("loginCheck"), function (req, res, next) {
+    app.get("/login", app.get("ifUnlogged"), function (req, res, next) {
         res.send(view.render("login"));
     });
 
-    app.post("/login", app.get("loginCheck"), bodyParser, function (req, res, next) {
+    app.post("/login", app.get("ifUnlogged"), app.get("bodyParser"), function (req, res, next) {
         var params = req.body;
         if (params.type === "login") {
             db.connection.query("select * from users where username=? and password=password(?)",
@@ -89,7 +87,7 @@ exports.init = function (app) {
         } else {
             res.send(view.render("login"));
         }
-    }, app.get("loginCheck"));
+    }, app.get("ifUnlogged"));
     
     app.get("/logout", function (req, res, next) {
         if (!req.session.user) {

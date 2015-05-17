@@ -10,13 +10,23 @@ process.on("uncaughtException", function (err) {
 
 var app = express();
 
-app.set("loginCheck", function (req, res, next) {
+app.set("ifUnlogged", function (req, res, next) {
     if (req.session.user) {
         res.redirect("/blog/" + req.session.user.id);
     } else {
         next();
     }
 });
+
+app.set("ifLogged", function (req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        res.redirect("/login");
+    }
+});
+
+app.set("bodyParser", require("body-parser").urlencoded({ extended: false }));
 
 app.use(session({
     name: "s",
@@ -25,7 +35,7 @@ app.use(session({
 
 app.use(express.static(__dirname + "/../public"));
 
-app.get("/", app.get("loginCheck"), function (req, res, next) {
+app.get("/", app.get("ifUnlogged"), function (req, res, next) {
     res.redirect("/login");
 });
 
@@ -61,18 +71,14 @@ app.get("/blog/:uid/tag/:tag_id", function (req, res, next) {
     res.send("tag " + req.params.blog_id);
 });
 
-app.get("/edit", function (req, res, next) {
-    if (req.session.user) {
-        next();
-    } else {
-        res.redirect("/login");
-    }
-}, function (req, res, next) {
+app.get("/edit", app.get("ifLogged"), function (req, res, next) {
     db.getCategories(req.session.user.id, req, res, next);
 }, function (req, res, next) {
     req.user = req.session.user;
     res.send(view.render("edit", req));
 });
+
+app.post("/create_category", app.get("ifLogged"), app.get("bodyParser"), db.createCategory);
 
 require("./account").init(app);
 
