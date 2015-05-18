@@ -33,6 +33,7 @@ var viewCompile = function (input, output) {
         sweet.loadMacro("./server/macro");
         _macroLoaded = true;
     }
+    console.log("compiling " + input);
     var source = fs.readFileSync(input).toString("UTF-8");
     var result = sweet.compile(source);
     fs.writeFileSync(output, result.code);

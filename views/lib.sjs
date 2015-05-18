@@ -1,3 +1,5 @@
+var escapeHTML = require("escape-html");
+
 exports.script = function (src) {
     return '<script src="' + src + '"></script>';
 };
@@ -29,23 +31,19 @@ exports.formatTime = function (date) {
         date.getSeconds()].join("");
 };
 
-exports.unescapeHTML = function (str) {
-    return str.replace(/&amp;/g, "&")
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">");
+exports.processContent = function (content) {
+    return "<p>" + escapeHTML(content).replace(/\r\n|\r|\n/g, "</p><p>") + "</p>";
 };
 
 exports.unprocessContent = function (content) {
-    return exports.unescapeHTML(
-        content.substring(3, content.length - 4)
-            .replace(/<\/p><p>/g, "\n"));
+    content = String(content);
+    return content.substring(3, content.length - 4)
+        .replace(/<\/p><p>/g, "\n");
 };
 
 var hasPrivil = function (req) {
-    return req.session.user.id === req.user.id? 1:
-        req.session.user.type === 2? 2: 0;
+    return req.session.user? req.session.user.id === req.user.id? 1:
+        req.session.user.type === 2? 2: 0: 0;
 };
 
 exports.blogOperations = View(req, blog, separator) {
@@ -60,6 +58,32 @@ exports.blogOperations = View(req, blog, separator) {
         a.delete_blog (href='/delete/' + blog.id +
                 '?goto=/blog/' + req.user.id + '/blog_list') {
             @'删除';
+        }
+    }
+};
+
+exports.toolbar = View(req) {
+    div#toolbar {
+        span {
+            if (req.session.user) {
+                @req.session.user.nickname;
+                @' ';
+                a (href='/blog/' + req.session.user.id) {
+                    @'我的博客';
+                }
+                @' ';
+                a (href='/account') {
+                    @'我的账号';
+                }
+                @' ';
+                a (href='/logout?goto=' + req.originalUrl) {
+                    @'退出';
+                }
+            } else {
+                a (href='/login') {
+                    @'登录';
+                }
+            }
         }
     }
 };

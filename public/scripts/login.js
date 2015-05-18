@@ -6,8 +6,7 @@ $(function () {
         signupUsername = signupForm.username,
         signupNickname = signupForm.nickname,
         signupPassword = signupForm.password,
-        signupConfirm = signupForm.confirm_password,
-        alert = $("div.alert")[0];
+        signupConfirm = signupForm.confirm_password;
     
     var toggle = $("#toggle").click(function () {
         if (document.body.className === "") {
@@ -41,12 +40,6 @@ $(function () {
         signupConfirm.value = "";
     });
     
-    var err = function (msg, control, event) {
-        alert.textContent = msg;
-        control.focus();
-        event.preventDefault();
-    };
-    
     var save = function () {
         setCookie("lun", loginUsername.value);
         setCookie("sun", signupUsername.value);
@@ -55,38 +48,15 @@ $(function () {
     
     $(loginForm).submit(function (event) {
         save();
-        if (loginUsername.value === "") {
-            err("用户名不能为空", loginUsername, event);
-        } else if (loginPassword.value === "") {
-            err("密码不能为空", loginPassword, event);
-        }
+        validateUsername(loginUsername, event) ||
+            validatePassword(loginPassword, event);
     });
     
     $(signupForm).submit(function (event) {
         save();
-        var username = signupUsername.value,
-            password = signupPassword.value;
-        if (username === "") {
-            err("用户名不能为空", signupUsername, event);
-        } else if (username.length < 2) {
-            err("用户名太短", signupUsername, event);
-        } else if (username.length > 14) {
-            err("用户名太长", signupUsername, event);
-        } else if (/[^A-Za-z0-9_]/.test(username)) {
-            err("用户名只能包含英文字母、数字、下划线", signupUsername, event);
-        } else if (password === "") {
-            err("密码不能为空", signupPassword, event);
-        } else if (password.length < 6) {
-            err("密码太短", signupPassword, event);
-        } else if (username.length > 25) {
-            err("密码太长", signupPassword, event);
-        } else if (/[^\x20-\x7e]/.test(password)) {
-            err("密码含有非法字符", signupPassword, event);
-        } else if (/^[0-9]+$/.test(password)) {
-            err("密码不能只包含数字", signupPassword, event);
-        } else if (signupConfirm.value !== password) {
-            err("重复密码不一致", signupConfirm, event);
-        }
+        validateNewUsername(signupUsername, event) ||
+            validateNickname(signupNickname, event) ||
+            validateNewPassword(signupPassword, signupConfirm, event);
     });
     
     $(window).on("beforeunload", save);

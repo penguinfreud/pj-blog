@@ -5,12 +5,8 @@ $(function () {
         input = $("#category_input")[0];
     
     $("#create_category_btn").click(function (event) {
-        if (panel.className === "") {
-            panel.className = "visible";
-            input.focus();
-        } else {
-            panel.className = "";
-        }
+        panel.className = "visible";
+        input.focus();
         event.preventDefault();
     });
     

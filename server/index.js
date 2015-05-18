@@ -108,6 +108,16 @@ app.post("/edit", ifLogged, bodyParser, function (req, res, next) {
 
 app.post("/create_category", ifLogged, bodyParser, db.createCategory);
 
+var redirectAccount = function (req, res, next) {
+    res.redirect("/account");
+};
+
+require("./upload").init(app);
+
+app.post("/modify_nickname", ifLogged, bodyParser, db.modifyNickname, redirectAccount);
+app.post("/modify_password", ifLogged, bodyParser, db.modifyPassword, redirectAccount);
+app.post("/modify_description", ifLogged, bodyParser, db.modifyDescription, redirectAccount);
+
 require("./account").init(app);
 
 app.use(function (req, res, next) {

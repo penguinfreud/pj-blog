@@ -17,23 +17,7 @@ exports.run = View(req, data) {
             @lib.style('/css/main.css');
         }
         body {
-            div#toolbar {
-                span {
-                    if (req.session.user) {
-                        a (href='/blog/' + req.session.user.id) {
-                            @req.session.user.nickname + '的博客';
-                        }
-                        @' ';
-                        a (href='/logout?goto=' + path) {
-                            @'退出';
-                        }
-                    } else {
-                        a (href='/login') {
-                            @'登录';
-                        }
-                    }
-                }
-            }
+            @lib.toolbar(req);
             div#header {
                 div#title {
                     h1#name {

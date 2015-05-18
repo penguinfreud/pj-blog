@@ -1,7 +1,7 @@
 var view = require("../server/view"),
     lib = view.require("lib");
 
-exports.run = View(message) {
+exports.run = View() {
     html {
         head {
             @lib.title('登录');
@@ -9,6 +9,7 @@ exports.run = View(message) {
             @lib.style('/css/ui.css');
             @lib.script('/scripts/jquery-2.1.4.min.js');
             @lib.script('/scripts/cookie.js');
+            @lib.script('/scripts/validate.js');
             @lib.script('/scripts/login.js');
         }
         body {
@@ -21,9 +22,7 @@ exports.run = View(message) {
                 div#logo {}
             }
             div#input_container {
-                div.alert {
-                    @(message || '');
-                }
+                div.alert {}
                 form#login_form (action='/login', method='POST') {
                     input (type='hidden', name='type', value='login');
                     div {

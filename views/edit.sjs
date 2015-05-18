@@ -1,5 +1,6 @@
 var view = require("../server/view"),
-    lib = view.require("lib");
+    lib = view.require("lib"),
+    escapeHTML = require("escape-html");
 
 exports.run = View(req) {
     var blog = req.blog, i, l;
@@ -18,11 +19,11 @@ exports.run = View(req) {
                     }
                     @'标题：';
                     br;
-                    input (type='text', name='title', value=blog? lib.unescapeHTML(blog.title): '');
+                    input (type='text', name='title', value=blog? blog.title: '');
                     br;
                     textarea (name='content') {
                         if (blog) {
-                            @lib.unprocessContent(blog.content);
+                            @escapeHTML(blog.content);
                         }
                     }
                     br;
@@ -59,7 +60,7 @@ exports.run = View(req) {
                             if (blog) {
                                 var sTags = [], tags = blog.tags;
                                 for (i = 0, l = tags.length; i<l; i++) {
-                                    sTags.push(lib.unescapeHTML(tags[i].name));
+                                    sTags.push(tags[i].name);
                                 }
                             }
                         }

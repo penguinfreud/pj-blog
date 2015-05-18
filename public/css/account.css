@@ -1,0 +1,68 @@
+#body {
+    width: 700px;
+    margin: 0 auto;
+    margin-top: 60px;
+    border: 1px solid #ccc;
+    padding: 4px 16px;
+    border-radius: 12px;
+    background-color: #fff;
+}
+
+#body>div {
+    margin: 18px 0;
+}
+
+form {
+    display: inline;
+}
+
+#modify_password_form label {
+    display: inline-block;
+    width: 6em;
+}
+
+textarea {
+    width: 100%;
+    max-width: 100%;
+    min-height: 200px;
+}
+
+body .modify_panel>* {
+    display: none;
+}
+
+body.visible .modify_panel>span {
+    display: inline;
+}
+
+body.visible .modify_panel>div {
+    display: block;
+}
+
+body .modify_panel .toggle {
+    display: inline;
+}
+
+body.visible .modify_panel .toggle {
+    display: none;
+}
+
+body.visible div.field {
+    display: none;
+}
+
+body.icon.visible div.field.icon {
+    display: block;
+}
+
+body.nickname.visible div.field.nickname {
+    display: block;
+}
+
+body.password.visible div.field.password {
+    display: block;
+}
+
+body.description.visible div.field.description {
+    display: block;
+}

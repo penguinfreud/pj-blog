@@ -21,6 +21,7 @@
     "cookie-session": "1.1.x",
     "escape-html": "1.0.x",
     "express": "4.12.x",
+    "multer": "0.1.x",
     "mysql2": "0.15.x",
     "sweet.js": "0.7.x"
 },

@@ -1,5 +1,6 @@
 var mysql = require("mysql2"),
-escapeHTML = require("escape-html");
+escapeHTML = require("escape-html"),
+validate = require("./validate");
 
 var conn = exports.connection = mysql.createConnection({
     user: "wsy",
@@ -44,7 +45,7 @@ exports.getBlogs = function (hasContent, count) {
         }
         
         conn.query("select id, uid, title" +
-            (hasContent? ", substr(content, 0, 250)": "") +
+            (hasContent? ", substr(content, 1, 250) as content": "") +
             ", created_time, category, read_count, like_count, comment_count from blogs where uid=? limit ? offset ?",
         [req.params.uid, count, start], function (err, rows) {
             if (err) {
@@ -133,10 +134,6 @@ exports.getSingleCategory = function (req, res, next) {
     });
 };
 
-var processContent = function (content) {
-    return "<p>" + escapeHTML(content).replace(/\r\n|\r|\n/g, "</p><p>") + "</p>";
-};
-
 var checkCategory = function (uid, category, next, cb) {
     conn.query("select * from categories where uid=? and id=?",
     [uid, category], function (err, rows) {
@@ -189,7 +186,7 @@ var addTags = function (id, tags, next) {
 exports.postBlog = function (req, res, next) {
     var uid = req.session.user.id,
     title = escapeHTML(req.body.title),
-    content = processContent(req.body.content),
+    content = req.body.content,
     category = req.body.category;
     tags = escapeHTML(req.body.tags).split(/\s+/g);
     
@@ -214,7 +211,7 @@ exports.editBlog = function (req, res, next) {
     var id = req.body.id,
     uid = req.session.user.id,
     title = escapeHTML(req.body.title),
-    content = processContent(req.body.content),
+    content = req.body.content,
     category = req.body.category;
     tags = escapeHTML(req.body.tags).split(/\s+/g),
     count = 0;
@@ -255,4 +252,114 @@ exports.editBlog = function (req, res, next) {
     };
     
     checkCategory(uid, category, next, f1);
+};
+
+exports.login = function (req, res, next) {
+    conn.query("select * from users where username=? and password=password(?)",
+        [req.body.username, req.body.password],
+        function (err, rows) {
+            if (err) {
+                next(err);
+            } else if (rows.length === 1) {
+                req.session.user = rows[0];
+                res.redirect("/");
+            } else {
+                res.send(view.render("login", "用户名或密码错误"));
+            }
+        });
+};
+
+exports.signup = function (req, res, next) {
+    var body = req.body;
+    conn.query("select id from users where username=?",
+        [body.username], function (err, rows) {
+            if (err) {
+                next(err);
+            } else if (rows.length > 0) {
+                res.send(view.render("login", "该用户名已被注册"));
+            } else {
+                conn.execute("insert into users (username, password, nickname, type) values (?, password(?), ?, 1)",
+                [body.username, body.password, body.nickname],
+                function (err, result) {
+                    if (err) {
+                        next(err);
+                    } else {
+                        conn.execute("insert into categories (name, uid) values ('默认分类', ?)",
+                        [result.insertId], function (err, result) {
+                            if (err) {
+                                console.log(err.stack);
+                            }
+                        });
+                        req.session.user = {
+                            id: result.insertId,
+                            username: body.username,
+                            password: "",
+                            nickname: body.nickname,
+                            type: 1,
+                            description: null,
+                            icon: "default.png" 
+                        };
+                        next();
+                    }
+                });
+            }
+        });
+};
+
+exports.modifyIcon = function (req, res, next) {
+    conn.execute("update users set icon=? where id=?",
+        [req.icon, req.uid], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                req.session.user.icon = req.icon;
+                next();
+            }
+        });
+};
+
+exports.modifyNickname = function (req, res, next) {
+    var nickname = escapeHTML(req.body.nickname);
+    if (nickname) {
+        conn.execute("update users set nickname=? where id=?",
+            [nickname, req.session.user.id], function (err, result) {
+                if (err) {
+                    next(err);
+                } else {
+                    req.session.user.nickname = req.body.nickname;
+                    next();
+                }
+            });
+    } else {
+        next();
+    }
+};
+
+exports.modifyPassword = function (req, res, next) {
+    var password = req.body.password,
+        msg = validate.validatePassword(password, req.body.confirm_password);
+    if (msg) {
+        res.send(msg);
+    } else {
+        conn.execute("update users set password=password(?) where id=?",
+            [password, req.session.user.id], function (err, result) {
+                if (err) {
+                    next(err);
+                } else {
+                    next();
+                }
+            });
+    }
+};
+
+exports.modifyDescription = function (req, res, next) {
+    conn.execute("update users set description=? where id=?",
+        [req.body.description, req.session.user.id], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                req.session.user.description = req.body.description;
+                next();
+            }
+        });
 };

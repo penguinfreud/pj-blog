@@ -2,11 +2,11 @@ body {
     background-color: #f9f9fd;
 }
 
-#header a:visited {
+#header a:visited, a[href="#"]:visited, .blog_operations a:visited {
     color: #269;
 }
 
-#header a:hover {
+#header a:hover, a[href="#"]:hover, .blog_operations a:hover {
     color: #fff;
 }
 
@@ -29,7 +29,7 @@ a:hover {
     display: inline-block;
     padding: 6px 12px;
     line-height: 20px;
-    color: #333;
+    color: #333 !important;
     background-image: linear-gradient(#fcfcfc, #eee);
     cursor: pointer;
     border: 1px solid #d5d5d5;
@@ -43,6 +43,7 @@ a:hover {
 }
 
 .button:hover {
+    color: #333 !important;
     text-decoration: none;
     background-color: #ddd;
     background-image: -webkit-linear-gradient(#eee, #ddd);
@@ -97,4 +98,9 @@ input[type="text"], input[type="password"] {
     line-height: 1;
     margin-top: 4px;
     margin-bottom: 12px;
+}
+
+#toolbar {
+    width: 100%;
+    text-align: right;
 }

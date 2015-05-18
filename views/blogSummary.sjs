@@ -38,7 +38,7 @@ exports.run = View(req, blog, isBlogPage) {
         }
     }
     div.blog_content {
-        @blog.content;
+        @lib.processContent(blog.content);
     }
     div.blog_operations {
         if (isBlogPage) {
@@ -57,8 +57,10 @@ exports.run = View(req, blog, isBlogPage) {
         
         @lib.blogOperations(req, blog, ' | ');
         
-        a.align_right (href=blogPath) {
-            @'查看全文&gt;&gt;';
+        if (!isBlogPage) {
+            a.align_right (href=blogPath) {
+                @'查看全文&gt;&gt;';
+            }
         }
     }
 };

@@ -1,3 +1,6 @@
 *~
 node_modules
 views/*.js
+icons/*
+!icons/default.png
+uploads/*
