@@ -41,7 +41,7 @@ exports.unprocessContent = function (content) {
         .replace(/<\/p><p>/g, "\n");
 };
 
-var hasPrivil = function (req) {
+var hasPrivil = exports.hasPrivil = function (req) {
     return req.session.user? req.session.user.id === req.user.id? 1:
         req.session.user.type === 2? 2: 0: 0;
 };

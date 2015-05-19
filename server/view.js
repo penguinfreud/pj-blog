@@ -35,8 +35,12 @@ var viewCompile = function (input, output) {
     }
     console.log("compiling " + input);
     var source = fs.readFileSync(input).toString("UTF-8");
-    var result = sweet.compile(source);
-    fs.writeFileSync(output, result.code);
+    try {
+        var result = sweet.compile(source);
+        fs.writeFileSync(output, result.code);
+    } catch (e) {
+        console.error(e.stack);
+    }
 };
 
 var slice = Array.prototype.slice;

@@ -75,7 +75,12 @@ function (req, res, next) {
 });
 
 app.get("/blog/:uid/entry/:blog_id",
-    [db.getUser, db.getSingleBlog, db.getSingleCategory],
+        [db.getUser,
+        db.getSingleBlog,
+        db.getSingleCategory,
+        db.getComments],
+        [db.getPrevBlog,
+        db.getNextBlog],
     function (req, res, next) {
         res.send(view.render("blog", req));
     });
