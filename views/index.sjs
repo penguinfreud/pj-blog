@@ -1,17 +1,18 @@
-var view = require("../server/view");
+var view = require("../server/view"),
+    lib = view.require("lib");
 
 exports.run = View(req) {
-    var body = @{
-        div#body_left {
-            @view.render("info", req);
-            @view.render("categories", req);
+    html {
+        head {
+            @lib.title('博客');
+            @lib.style('/css/ui.css');
+            @lib.style('/css/main.css');
         }
-        div#body_right {
-            @view.render("blogSummaryList", req);
+        body {
+            @lib.toolbar(req);
+            div#body {
+                @view.render("blogSummaryList", req, 1);
+            }
         }
-    };
-    return view.render("layout", req, {
-        nav: 0,
-        body: body
-    });
+    }
 };

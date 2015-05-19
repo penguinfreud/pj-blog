@@ -64,7 +64,7 @@
     text-align: center;
 }
 
-.blog_title a {
+.blog_title {
     font-size: 1.2em;
     line-height: 180%;
 }
@@ -80,7 +80,6 @@
 }
 
 .blog:first-child {
-    padding-top: 36px;
     border-top: none;
 }
 

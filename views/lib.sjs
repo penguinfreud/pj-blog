@@ -22,6 +22,16 @@ exports.getCategoryName = function (categories, id) {
     return "";
 };
 
+exports.getNickname = function (users, id) {
+    var i = users.length;
+    while (i--) {
+        if (users[i].id === id) {
+            return users[i].nickname;
+        }
+    }
+    return "";
+};
+
 exports.formatTime = function (date) {
     return [date.getFullYear(), "年",
         date.getMonth() + 1, "月",
@@ -42,7 +52,7 @@ exports.unprocessContent = function (content) {
 };
 
 var hasPrivil = exports.hasPrivil = function (req) {
-    return req.session.user? req.session.user.id === req.user.id? 1:
+    return req.session.user? req.user && req.session.user.id === req.user.id? 1:
         req.session.user.type === 2? 2: 0: 0;
 };
 
@@ -56,7 +66,7 @@ exports.blogOperations = View(req, blog, separator) {
             @separator;
         }
         a.delete_blog (href='/delete/' + blog.id +
-                '?goto=/blog/' + req.user.id + '/blog_list') {
+                '?goto=/blog/' + blog.uid + '/blog_list') {
             @'删除';
         }
     }

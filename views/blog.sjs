@@ -11,7 +11,7 @@ exports.run = View(req) {
             }
             div.panel_content {
                 div.blog {
-                    @view.render("blogSummary", req, req.blog, true);
+                    @view.render("blogSummary", req, req.blog, 1);
                     div.blog_comments {
                         h3 {
                             a (name='comments') {}

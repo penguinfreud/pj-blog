@@ -1,16 +1,24 @@
 var view = require("../server/view"),
     lib = view.require("lib");
 
-exports.run = View(req, blog, isBlogPage) {
-    var path = '/blog/' + req.user.id,
+exports.run = View(req, blog, type) {
+    var path = '/blog/' + blog.uid,
         blogPath = path + "/entry/" + blog.id;
-    div.blog_title {
-        if (isBlogPage) {
-            span {
+    if (type === 2) {
+        div {
+            a (href=path) {
+                @lib.getNickname(req.users, blog.uid);
+            }
+            @'发表了';
+        }
+    }
+    div {
+        if (type === 1) {
+            span.blog_title {
                 @blog.title;
             }
         } else {
-            a (href=blogPath) {
+            a.blog_title (href=blogPath) {
                 @blog.title;
             }
         }
@@ -41,7 +49,7 @@ exports.run = View(req, blog, isBlogPage) {
         @lib.processContent(blog.content);
     }
     div.blog_operations {
-        if (isBlogPage) {
+        if (type === 1) {
             span {
                 @'阅读('; @blog.read_count; @')';
             }
@@ -57,7 +65,7 @@ exports.run = View(req, blog, isBlogPage) {
         
         @lib.blogOperations(req, blog, ' | ');
         
-        if (!isBlogPage) {
+        if (type !== 1) {
             a.align_right (href=blogPath) {
                 @'查看全文&gt;&gt;';
             }

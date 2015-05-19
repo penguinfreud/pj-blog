@@ -38,9 +38,11 @@ app.use(session({
 
 app.use(express.static(__dirname + "/../public"));
 
-app.get("/", ifUnlogged, function (req, res, next) {
-    res.redirect("/login");
-});
+app.get("/", db.getBlogs(1, 1, 10),
+    [db.getAuthors, db.getBlogCategories],
+    function (req, res, next) {
+        res.send(view.render("index", req));
+    });
 
 var getCategories = function (req, res, next) {
     db.getCategories(req.params.uid, req, res, next);
@@ -56,10 +58,10 @@ app.get("/blog", function (req, res, next) {
 
 app.get("/blog/:uid",
     [db.getUser,
-    db.getBlogs(1, 10),
+    db.getBlogs(0, 1, 10),
     getCategories],
 function (req, res, next) {
-    res.send(view.render("index", req));
+    res.send(view.render("userIndex", req));
 });
 
 app.get("/blog/:uid/category/:category_id", function (req, res, next) {
@@ -68,7 +70,7 @@ app.get("/blog/:uid/category/:category_id", function (req, res, next) {
 
 app.get("/blog/:uid/blog_list",
     [db.getUser,
-    db.getBlogs(0, 20),
+    db.getBlogs(0, 0, 20),
     getCategories],
 function (req, res, next) {
     res.send(view.render("blogListPage", req));

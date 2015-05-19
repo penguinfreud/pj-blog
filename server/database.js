@@ -37,7 +37,7 @@ exports.getUser = function (req, res, next) {
     });
 };
 
-exports.getBlogs = function (hasContent, count) {
+exports.getBlogs = function (allUser, hasContent, count) {
     return function (req, res, next) {
         var start = parseInt(req.query.start);
         if (!isFinite(start) || start < 0) {
@@ -45,10 +45,14 @@ exports.getBlogs = function (hasContent, count) {
         }
         req.start = start;
         
+        var where = allUser? "": " where uid=?"
+        
         conn.query("select id, uid, title" +
             (hasContent? ", substr(content, 1, 250) as content": "") +
-            ", created_time, category, read_count, like_count, comment_count from blogs where uid=? order by created_time desc limit ? offset ?",
-        [req.params.uid, count, start], function (err, rows) {
+            ", created_time, category, read_count, like_count, comment_count from blogs" + where +
+            " order by created_time desc limit ? offset ?",
+        allUser? [count, start]: [req.params.uid, count, start],
+        function (err, rows) {
             if (err) {
                 next(err);
             } else {
@@ -81,6 +85,50 @@ var getBlogTags = function (context) {
             }
         });
     };
+};
+
+exports.getAuthors = function (req, res, next) {
+    var blogs = req.blogs, i, l = blogs.length, uids = [], uid;
+    if (l > 0) {
+        for (i = 0; i<l; i++) {
+            uid = blogs[i].uid
+            if (uids.indexOf(uid) === -1) {
+                uids.push(uid);
+            }
+        }
+        conn.query("select id, nickname from users where id in (?" +
+            new Array(uids.length).join(", ?") + ")",
+            uids, function (err, rows) {
+                if (err) {
+                    next(err);
+                } else {
+                    req.users = rows;
+                    next();
+                }
+            });
+    }
+};
+
+exports.getBlogCategories = function (req, res, next) {
+    var blogs = req.blogs, i, l = blogs.length, categories = [], category;
+    if (l > 0) {
+        for (i = 0; i<l; i++) {
+            category = blogs[i].category;
+            if (categories.indexOf(category) === -1) {
+                categories.push(category);
+            }
+        }
+        conn.query("select id, name from categories where id in (?" +
+            new Array(categories.length).join(", ?") + ")",
+            categories, function (err, rows) {
+                if (err) {
+                    next(err);
+                } else {
+                    req.categories = rows;
+                    next();
+                }
+            });
+    }
 };
 
 exports.getCategories = function (uid, req, res, next) {
