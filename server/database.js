@@ -12,17 +12,6 @@ process.on("exit", function () {
     conn.close();
 });
 
-var $cb = function (req, key, next) {
-    return function (err, rows) {
-        if (err) {
-            next(err);
-        } else {
-            req[key] = rows;
-            next();
-        }
-    };
-}
-
 exports.getUser = function (req, res, next) {
     conn.query("select id, nickname, icon, description from users where id=?",
     [req.params.uid], function (err, rows) {
@@ -133,7 +122,14 @@ exports.getBlogCategories = function (req, res, next) {
 
 exports.getCategories = function (uid, req, res, next) {
     conn.query("select * from categories where uid=?",
-    [uid], $cb(req, "categories", next));
+        [uid], function (err, rows) {
+            if (err) {
+                next(err);
+            } else {
+                req.categories = rows;
+                next();
+            }
+        });
 };
 
 exports.createCategory = function (req, res, next) {
@@ -251,6 +247,27 @@ exports.getComments = function (req, res, next) {
                 }
             }
         });
+};
+
+exports.postComment = function (req, res, next) {
+    var cb = function (err, result) {
+        if (err) {
+            next(err);
+        } else {
+            next();
+        }
+    };
+    
+    var body = req.body;
+    if (req.session.user) {
+        conn.execute("insert into comments (blog_id, uid, content, created_time) values (?, ?, ?, now())",
+            [req.params.blog_id, req.session.user.id, body.content], cb);
+    } else {
+        var email = escapeHTML(body.email),
+            name = escapeHTML(body.name);
+        conn.execute("insert into comments (blog_id, email, name, content, created_time) values (?, ?, ?, ?, now())",
+            [req.params.blog_id, email, name, body.content], cb);
+    }
 };
 
 var checkCategory = function (uid, category, next, cb) {

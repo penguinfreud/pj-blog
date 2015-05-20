@@ -29,7 +29,7 @@ exports.run = View(req) {
                                     }
                                 }
                                 div.comment_content {
-                                    @comment.content;
+                                    @lib.processContent(comment.content);
                                 }
                                 div.comment_bottom {
                                     span.comment_timestamp {

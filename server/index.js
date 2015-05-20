@@ -113,6 +113,11 @@ app.post("/edit", ifLogged, bodyParser, function (req, res, next) {
     res.redirect("/blog/" + req.uid + "/entry/" + req.blogId);
 });
 
+app.post("/blog/:uid/entry/:blog_id/post_comment", bodyParser, db.postComment,
+    function (req, res, next) {
+        res.redirect("/blog/" + req.params.uid + "/entry/" + req.params.blog_id);
+    });
+
 app.post("/create_category", ifLogged, bodyParser, db.createCategory);
 
 var redirectAccount = function (req, res, next) {
