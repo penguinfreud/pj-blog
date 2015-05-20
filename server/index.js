@@ -96,22 +96,30 @@ app.get("/edit", ifLogged, getCategories2, function (req, res, next) {
     res.send(view.render("edit", req));
 });
 
-app.get("/edit/:blog_id", ifLogged,
+app.get("/blog/:uid/edit/:blog_id", ifLogged,
     [db.getSingleBlog, getCategories2],
     function (req, res, next) {
         req.user = req.session.user;
         res.send(view.render("edit", req));
     });
 
-app.post("/edit", ifLogged, bodyParser, function (req, res, next) {
-    if (req.body.id) {
-        db.editBlog(req, res, next);
-    } else {
-        db.postBlog(req, res, next);
-    }
-}, function (req, res, next) {
+var redirectBlog = function (req, res, next) {
     res.redirect("/blog/" + req.uid + "/entry/" + req.blogId);
-});
+};
+
+app.post("/post_blog", ifLogged, bodyParser,
+    db.checkCategory,
+    [db.updateCategory,
+    db.postBlog],
+    db.addTags,
+    redirectBlog);
+
+app.post("/blog/:uid/edit/:blog_id", ifLogged, bodyParser,
+    [db.checkAuthor,
+    db.checkCategory],
+    db.editBlog,
+    db.addTags,
+    redirectBlog);
 
 app.post("/blog/:uid/entry/:blog_id/post_comment", bodyParser, db.postComment,
     function (req, res, next) {

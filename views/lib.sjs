@@ -60,12 +60,12 @@ exports.blogOperations = View(req, blog, separator) {
     if (hasPrivil(req)) {
         @separator;
         if (hasPrivil(req) === 1) {
-            a.edit_blog (href='/edit/' + blog.id) {
+            a.edit_blog (href='/blog/' + blog.uid + "/edit/" + blog.id) {
                 @'编辑';
             }
             @separator;
         }
-        a.delete_blog (href='/delete/' + blog.id +
+        a.delete_blog (href='/blog/' + blog.uid + "/delete/" + blog.id +
                 '?goto=/blog/' + blog.uid + '/blog_list') {
             @'删除';
         }

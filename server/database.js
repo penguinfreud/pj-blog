@@ -141,7 +141,7 @@ exports.createCategory = function (req, res, next) {
                 console.log(e.stack);
                 res.send();
             } else {
-                res.send(result.insertId);
+                res.send("" + result.insertId);
             }
         });
     } else {
@@ -270,125 +270,133 @@ exports.postComment = function (req, res, next) {
     }
 };
 
-var checkCategory = function (uid, category, next, cb) {
-    conn.query("select * from categories where uid=? and id=?",
-    [uid, category], function (err, rows) {
-        if (err) {
-            next(err);
-        } else if (rows.length === 1) {
-            cb(category);
-            updateCategory(category, next);
-        } else {
-            conn.query("select id from categories where uid=? and name=?",
-            [uid, "默认分类"], function (err, rows) {
-                if (err) {
-                    next(err);
-                } else if (rows.length === 1) {
-                    cb(rows[0].id);
-                    updateCategory(category, next);
-                }
-            });
-        }
-    });
-};
-
-var updateCategory = function (category, next) {
-    conn.execute("update categories set blog_count=blog_count+1 where id=?",
-        [category], function (err, result) {
+exports.checkAuthor = function (req, res, next) {
+    conn.query("select category from blogs where id=? and uid=?",
+        [req.body.id, req.session.user.id], function (err, rows) {
             if (err) {
                 next(err);
+            } else if (rows.length === 1) {
+                req.oldCategory = rows[0].category;
+                next();
+            } else {
+                next(new Error("Blog does not exist"));
             }
         });
 };
 
-var addTags = function (id, tags, next) {
-    var i, l = tags.length, count = 0;
+exports.checkCategory = function (req, res, next) {
+    var uid = req.session.user.id;
+    conn.query("select * from categories where uid=? and id=?",
+    [uid, req.body.category], function (err, rows) {
+        if (err) {
+            next(err);
+        } else if (rows.length === 1) {
+            next();
+        } else {
+            conn.query("select id from categories where uid=? and name=?",
+                [uid, "默认分类"], function (err, rows) {
+                    if (err) {
+                        next(err);
+                    } else if (rows.length === 1) {
+                        req.body.category = rows[0].id;
+                        next();
+                    } else {
+                        next(new Error("No proper category"));
+                    }
+                });
+        }
+    });
+};
+
+exports.updateCategory = function (req, res, next) {
+    conn.execute("update categories set blog_count=blog_count+1 where id=?",
+        [req.body.category], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                next();
+            }
+        });
+};
+
+exports.addTags = function (req, res, next) {
+    var tags = escapeHTML(req.body.tags).split(/\s+/g),
+        id = req.blogId,
+        i, l = tags.length, count = 0;
     if (l === 0) {
         next();
     } else {
         for (i = 0; i<l; i++) {
             conn.execute("insert into tags (blog_id, name) values (?, ?)", 
-            [id, tags[i]], function (err, result) {
-                if (err) {
-                    next(err);
-                } else if (++count === l) {
-                    next();
-                }
-            });
+                [id, tags[i]], function (err, result) {
+                    if (err) {
+                        next(err);
+                    } else if (++count === l) {
+                        next();
+                    }
+                });
         }
     }
 };
 
 exports.postBlog = function (req, res, next) {
-    var uid = req.session.user.id,
-    title = escapeHTML(req.body.title),
-    content = req.body.content,
-    category = req.body.category;
-    tags = escapeHTML(req.body.tags).split(/\s+/g);
-    
+    var uid = req.session.user.id;
     req.uid = uid;
     
-    var f1 = function (category) {
-        conn.execute("insert into blogs (uid, title, content, category, created_time, last_modified) values (?, ?, ?, ?, now(), now())",
-        [uid, title, content, category], function (err, result) {
+    conn.execute("insert into blogs (uid, title, content, category, created_time, last_modified) values (?, ?, ?, ?, now(), now())",
+            [uid,
+            escapeHTML(req.body.title),
+            req.body.content,
+            req.body.category],
+        function (err, result) {
             if (err) {
                 next(err);
             } else {
                 req.blogId = result.insertId;
-                addTags(result.insertId, tags, next);
+                next();
             }
         });
-    };
-    
-    checkCategory(uid, category, next, f1);
 };
 
-exports.editBlog = function (req, res, next) {
-    var id = req.body.id,
-    uid = req.session.user.id,
-    title = escapeHTML(req.body.title),
-    content = req.body.content,
-    category = req.body.category;
-    tags = escapeHTML(req.body.tags).split(/\s+/g),
-    count = 0;
-    
-    req.uid = uid;
-    req.blogId = id;
-    
-    var f1 = function (category) {
-        conn.query("select category from blogs where id=?",
-        [id], function (err, rows) {
-            if (err) {
-                next(err);
-            } else if (rows.length === 1) {
-                conn.execute("update categories set blog_count=blog_count-1 where id=?",
-                    [rows[0].category], function (err, result) {
-                        if (err) {
-                            next(err);
-                        }
-                    });
-                conn.execute("update blogs set title=?, content=?, category=?, last_modified=now()",
-                    [title, content, category], function (err, result) {
-                        if (err) {
-                            next(err);
-                        }
-                    });
-                conn.execute("delete from tags where blog_id=?",
-                    [id], function (err, result) {
-                        if (err) {
-                            next(err);
-                        } else {
-                            addTags(id, tags, next);
-                        }
-                    });
-            } else {
-                res.redirect("/blog/" + uid);
-            }
-        });
-    };
-    
-    checkCategory(uid, category, next, f1);
-};
+exports.editBlog = [
+    exports.updateCategory,
+    function (req, res, next) {
+        req.uid = req.session.user.id;
+        req.blogId = req.body.id;
+        conn.execute("update categories set blog_count=blog_count-1 where id=?",
+            [req.oldCategory], function (err, result) {
+                if (err) {
+                    next(err);
+                } else {
+                    next();
+                }
+            });
+    },
+    function (req, res, next) {
+        conn.execute("update blogs set title=?, content=?, category=?, last_modified=now() where id=?",
+                [escapeHTML(req.body.title),
+                req.body.content,
+                req.body.category,
+                req.body.id],
+            function (err, result) {
+                if (err) {
+                    next(err);
+                } else {
+                    next();
+                }
+            });
+    },
+    function (req, res, next) {
+        conn.execute("delete from tags where blog_id=?",
+            [req.body.id], function (err, result) {
+                if (err) {
+                    next(err);
+                } else {
+                    next();
+                }
+            });
+    }
+];
 
 exports.login = function (req, res, next) {
     conn.query("select * from users where username=? and password=password(?)",

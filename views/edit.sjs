@@ -13,7 +13,8 @@ exports.run = View(req) {
                 @blog? '编辑': '发博文';
             }
             div.panel_content {
-                form#edit_form (action='/edit', method='POST') {
+                var action = blog? '/blog/' + blog.uid + '/edit/' + blog.id: '/post_blog';
+                form#edit_form (action=action, method='POST') {
                     if (blog) {
                         input (type='hidden', name='id', value=blog.id);
                     }
