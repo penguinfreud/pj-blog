@@ -19,7 +19,7 @@ exports.run = View(req) {
                         }
                         var comments = req.comments,
                             i, l = comments.length,
-                            hasPrivil = lib.hasPrivil(req);
+                            hasPrivil = lib.hasPrivil(req, req.blog);
                         for (i = 0; i<l; i++) {
                             var comment = comments[i];
                             div.comment {
@@ -37,7 +37,8 @@ exports.run = View(req) {
                                     }
                                     if (hasPrivil) {
                                         span.comment_operations {
-                                            a.del (href='#') {
+                                            a.del (href=path + '/entry/' + req.blog.id +
+                                                '/delete_comment/' + comment.id) {
                                                 @'删除';
                                             }
                                         }

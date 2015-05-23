@@ -109,7 +109,7 @@ var redirectBlog = function (req, res, next) {
 
 app.post("/post_blog", ifLogged, bodyParser,
     db.checkCategory,
-    [db.updateCategory,
+    [db.incCategory,
     db.postBlog],
     db.addTags,
     redirectBlog);
@@ -117,9 +117,15 @@ app.post("/post_blog", ifLogged, bodyParser,
 app.post("/blog/:uid/edit/:blog_id", ifLogged, bodyParser,
     [db.checkAuthor,
     db.checkCategory],
+    db.decCategory,
     db.editBlog,
     db.addTags,
     redirectBlog);
+
+app.get("/blog/:uid/delete/:blog_id", ifLogged, db.checkPrivil, db.deleteBlog,
+    function (req, res, next) {
+        res.redirect("/blog/" + req.params.uid);
+    });
 
 app.post("/blog/:uid/entry/:blog_id/post_comment", bodyParser, db.postComment,
     function (req, res, next) {

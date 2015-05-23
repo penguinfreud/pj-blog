@@ -51,22 +51,22 @@ exports.unprocessContent = function (content) {
         .replace(/<\/p><p>/g, "\n");
 };
 
-var hasPrivil = exports.hasPrivil = function (req) {
-    return req.session.user? req.user && req.session.user.id === req.user.id? 1:
+var hasPrivil = exports.hasPrivil = function (req, blog) {
+    return req.session.user? req.session.user.id === blog.uid? 1:
         req.session.user.type === 2? 2: 0: 0;
 };
 
 exports.blogOperations = View(req, blog, separator) {
-    if (hasPrivil(req)) {
+    var privil = hasPrivil(req, blog);
+    if (privil) {
         @separator;
-        if (hasPrivil(req) === 1) {
+        if (privil === 1) {
             a.edit_blog (href='/blog/' + blog.uid + "/edit/" + blog.id) {
                 @'编辑';
             }
             @separator;
         }
-        a.delete_blog (href='/blog/' + blog.uid + "/delete/" + blog.id +
-                '?goto=/blog/' + blog.uid + '/blog_list') {
+        a.delete_blog (href='/blog/' + blog.uid + "/delete/" + blog.id) {
             @'删除';
         }
     }

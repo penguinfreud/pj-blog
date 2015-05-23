@@ -15,9 +15,6 @@ exports.run = View(req) {
             div.panel_content {
                 var action = blog? '/blog/' + blog.uid + '/edit/' + blog.id: '/post_blog';
                 form#edit_form (action=action, method='POST') {
-                    if (blog) {
-                        input (type='hidden', name='id', value=blog.id);
-                    }
                     @'标题：';
                     br;
                     input (type='text', name='title', value=blog? blog.title: '');

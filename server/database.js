@@ -271,17 +271,27 @@ exports.postComment = function (req, res, next) {
 };
 
 exports.checkAuthor = function (req, res, next) {
-    conn.query("select category from blogs where id=? and uid=?",
-        [req.body.id, req.session.user.id], function (err, rows) {
+    conn.query("select uid, category from blogs where id=?",
+        [req.params.blog_id], function (err, rows) {
             if (err) {
                 next(err);
             } else if (rows.length === 1) {
-                req.oldCategory = rows[0].category;
-                next();
+                if (rows[0].uid === req.session.user.id ||
+                    req.session.user.type === 2 && req.allowAdmin) {
+                    req.oldCategory = rows[0].category;
+                    next();
+                } else {
+                    next(new Error("You don't have privilege"));
+                }
             } else {
                 next(new Error("Blog does not exist"));
             }
         });
+};
+
+exports.checkPrivil = function (req, res, next) {
+    req.allowAdmin = true;
+    exports.checkAuthor(req, res, next);
 };
 
 exports.checkCategory = function (req, res, next) {
@@ -308,7 +318,7 @@ exports.checkCategory = function (req, res, next) {
     });
 };
 
-exports.updateCategory = function (req, res, next) {
+exports.incCategory = function (req, res, next) {
     conn.execute("update categories set blog_count=blog_count+1 where id=?",
         [req.body.category], function (err, result) {
             if (err) {
@@ -318,6 +328,17 @@ exports.updateCategory = function (req, res, next) {
             }
         });
 };
+
+exports.decCategory = function (req, res, next) {
+    conn.execute("update categories set blog_count=blog_count-1 where id=?",
+        [req.oldCategory], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                next();
+            }
+        });
+}
 
 exports.addTags = function (req, res, next) {
     var tags = escapeHTML(req.body.tags).split(/\s+/g),
@@ -337,6 +358,17 @@ exports.addTags = function (req, res, next) {
                 });
         }
     }
+};
+
+exports.removeTags = function (req, res, next) {
+    conn.execute("delete from tags where blog_id=?",
+        [req.params.blog_id], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                next();
+            }
+        });
 };
 
 exports.postBlog = function (req, res, next) {
@@ -359,25 +391,16 @@ exports.postBlog = function (req, res, next) {
 };
 
 exports.editBlog = [
-    exports.updateCategory,
+    exports.incCategory,
+    exports.removeTags,
     function (req, res, next) {
         req.uid = req.session.user.id;
-        req.blogId = req.body.id;
-        conn.execute("update categories set blog_count=blog_count-1 where id=?",
-            [req.oldCategory], function (err, result) {
-                if (err) {
-                    next(err);
-                } else {
-                    next();
-                }
-            });
-    },
-    function (req, res, next) {
+        req.blogId = req.params.blog_id;
         conn.execute("update blogs set title=?, content=?, category=?, last_modified=now() where id=?",
                 [escapeHTML(req.body.title),
                 req.body.content,
                 req.body.category,
-                req.body.id],
+                req.blogId],
             function (err, result) {
                 if (err) {
                     next(err);
@@ -385,10 +408,15 @@ exports.editBlog = [
                     next();
                 }
             });
-    },
+    }
+];
+
+exports.deleteBlog = [
+    exports.decCategory,
+    exports.removeTags,
     function (req, res, next) {
-        conn.execute("delete from tags where blog_id=?",
-            [req.body.id], function (err, result) {
+        conn.execute("delete from blogs where id=?",
+            [req.params.blog_id], function (err, result) {
                 if (err) {
                     next(err);
                 } else {
