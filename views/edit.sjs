@@ -8,11 +8,13 @@ exports.run = View(req) {
         @lib.style('/css/edit.css');
         @lib.script('/scripts/jquery-2.1.4.min.js');
         @lib.script('/scripts/edit.js');
+        @lib.script('/scripts/validate.js');
         div#edit_blog.panel {
             div.panel_title {
                 @blog? '编辑': '发博文';
             }
             div.panel_content {
+                div.alert {}
                 var action = blog? '/blog/' + blog.uid + '/edit/' + blog.id: '/post_blog';
                 form#edit_form (action=action, method='POST') {
                     @'标题：';

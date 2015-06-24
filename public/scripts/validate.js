@@ -1,16 +1,8 @@
 var err;
 
-var validateUsername = function (username, event) {
-    if (username.value === "") {
-        err("用户名不能为空", username, event);
-        return 1;
-    }
-    return 0;
-};
-
-var validatePassword = function (password, event) {
-    if (password.value === "") {
-        err("密码不能为空", password, event);
+var validateNotEmpty = function (name, control, event) {
+    if (control.value === "") {
+        err(name + "不能为空", control, event);
         return 1;
     }
     return 0;
@@ -52,19 +44,11 @@ var validateNewPassword = function (password, confirm, event) {
     return 1;
 };
 
-var validateNickname = function (nickname, event) {
-    if (nickname.value === "") {
-        err("昵称不能为空", nickname, event);
-        return 1;
-    }
-    return 0;
-};
-
 $(function () {
     var alert = $(".alert")[0];
     err = function (msg, control, event) {
         alert.textContent = msg;
         control.focus();
-        event.preventDefault();
+        event && event.preventDefault();
     };
 });

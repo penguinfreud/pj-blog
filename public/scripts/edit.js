@@ -2,6 +2,7 @@ $(function () {
     var panel = $("#create_category_panel")[0],
         select = $('select[name="category"]'),
         title = $('input[name="title"]')[0],
+        content = $('textarea[name="content"]')[0],
         input = $("#category_input")[0];
     
     $("#create_category_btn").click(function (event) {
@@ -18,7 +19,7 @@ $(function () {
         input.value = "";
         event.preventDefault();
         
-        if (name) {
+        if (!validateNotEmpty("分类名", input, event)) {
             $.post("/create_category", { name: name },
             function (data) {
                 if (data) {
@@ -31,8 +32,6 @@ $(function () {
                     alert("创建分类失败");
                 }
             });
-        } else {
-            alert("分类名不能为空");
         }
     });
     
@@ -43,11 +42,7 @@ $(function () {
     });
     
     $("#edit_form").submit(function (event) {
-        if (title.value === "") {
-            if (!confirm("您确定不写标题吗？")) {
-                event.preventDefault();
-                title.focus();
-            }
-        }
+        validateNotEmpty("标题", title, event) ||
+            validateNotEmpty("正文", content, event);
     });
 });

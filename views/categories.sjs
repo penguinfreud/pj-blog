@@ -4,13 +4,6 @@ exports.run = View(req) {
         for (i = 0; i<l; i++) {
             sum += c[i].blog_count;
         }
-        
-        c.unshift({
-            name: "全部博文",
-            blog_count: sum
-        });
-        
-        l++;
     }
     div#categories.panel {
         div.panel_title {
@@ -18,6 +11,16 @@ exports.run = View(req) {
         }
         div.panel_content {
             ul {
+                li {
+                    a (href='/blog/' + req.user.id + "/blog_list") {
+                        @'全部博文';
+                    }
+                    span {
+                        @'(';
+                        @sum;
+                        @')';
+                    }
+                }
                 for (i = 0; i<l; i++) {
                     li {
                         a (href='/blog/' + req.user.id + '/category/' + c[i].id) {

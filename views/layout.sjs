@@ -21,12 +21,12 @@ exports.run = View(req, data) {
             div#header {
                 div#title {
                     h1#name {
-                        a (href='#') {
+                        a (href=path) {
                             @title;
                         }
                     }
                     div#link {
-                        a (href='#') {
+                        a (href=path) {
                             @'http://localhost' + path;
                         }
                     }

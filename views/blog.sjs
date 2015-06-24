@@ -5,6 +5,8 @@ exports.run = View(req) {
     var path = '/blog/' + req.params.uid;
     var body = @{
         @lib.style('/css/blog.css');
+        @lib.script('/scripts/jquery-2.1.4.min.js');
+        @lib.script('/scripts/blog.js');
         div#articlelist.panel {
             div.panel_title {
                 @'博文';

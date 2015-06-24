@@ -1,7 +1,7 @@
 var view = require("../server/view"),
     lib = view.require("lib");
 
-exports.run = View() {
+exports.run = View(msg) {
     html {
         head {
             @lib.title('登录');
@@ -22,7 +22,9 @@ exports.run = View() {
                 div#logo {}
             }
             div#input_container {
-                div.alert {}
+                div.alert {
+                    @msg;
+                }
                 form#login_form (action='/login', method='POST') {
                     input (type='hidden', name='type', value='login');
                     div {

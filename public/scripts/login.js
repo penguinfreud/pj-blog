@@ -48,14 +48,14 @@ $(function () {
     
     $(loginForm).submit(function (event) {
         save();
-        validateUsername(loginUsername, event) ||
-            validatePassword(loginPassword, event);
+        validateNotEmpty("用户名", loginUsername, event) ||
+            validateNotEmpty("密码", loginPassword, event);
     });
     
     $(signupForm).submit(function (event) {
         save();
         validateNewUsername(signupUsername, event) ||
-            validateNickname(signupNickname, event) ||
+            validateNotEmpty("昵称", signupNickname, event) ||
             validateNewPassword(signupPassword, signupConfirm, event);
     });
     

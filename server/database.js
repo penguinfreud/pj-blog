@@ -1,6 +1,7 @@
 var mysql = require("mysql2"),
 escapeHTML = require("escape-html"),
-validate = require("./validate");
+validate = require("./validate"),
+view = require("./view");
 
 var conn = exports.connection = mysql.createConnection({
     user: "wsy",
@@ -167,6 +168,21 @@ exports.getSingleBlog = function (req, res, next) {
     });
 };
 
+exports.increaseReadCount = function (req, res, next) {
+    if (!req.session.user || req.session.user.id !== parseInt(req.params.uid)) {
+        conn.execute("update blogs set read_count=read_count+1 where id=?",
+            [req.params.blog_id], function (err, result) {
+                if (err) {
+                    next(err);
+                } else {
+                    next();
+                }
+            });
+    } else {
+        next();
+    }
+};
+
 exports.getPrevBlog = function (req, res, next) {
     conn.query("select id, title from blogs where created_time<? and uid=? order by created_time asc limit 1",
         [req.blog.created_time, req.params.uid], function (err, rows) {
@@ -270,9 +286,55 @@ exports.postComment = function (req, res, next) {
     }
 };
 
+exports.checkComment = function (req, res, next) {
+    conn.query("select id from comments where id=? and blog_id=?",
+        [req.params.comment_id, req.params.blog_id], function (err, rows) {
+            if (err) {
+                next(err);
+            } else if (rows.length === 1) {
+                next();
+            } else {
+                next(new Error("Comment does not exist"));
+            }
+        });
+};
+
+exports.deleteComment = function (req, res, next) {
+    conn.execute("delete from comments where id=?",
+        [req.params.comment_id], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                next();
+            }
+        });
+};
+
+exports.incComment = function (req, res, next) {
+    conn.execute("update blogs set comment_count=comment_count+1 where id=?",
+        [req.params.blog_id], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                next();
+            }
+        });
+};
+
+exports.decComment = function (req, res, next) {
+    conn.execute("update blogs set comment_count=comment_count-1 where id=?",
+        [req.params.blog_id], function (err, result) {
+            if (err) {
+                next(err);
+            } else {
+                next();
+            }
+        });
+};
+
 exports.checkAuthor = function (req, res, next) {
-    conn.query("select uid, category from blogs where id=?",
-        [req.params.blog_id], function (err, rows) {
+    conn.query("select uid, category from blogs where id=? and uid=?",
+        [req.params.blog_id, req.params.uid], function (err, rows) {
             if (err) {
                 next(err);
             } else if (rows.length === 1) {

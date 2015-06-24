@@ -30,7 +30,7 @@ $(function () {
         originalNickname = nickname.value;
     
     $(modify_nickname_form).submit(function (event) {
-        if (!validateNickname(nickname) &&
+        if (!validateNotEmpty("昵称", nickname, event) &&
             nickname.value === originalNickname) {
             event.preventDefault();
             $(".modify_panel", nicknameForm)[0].className = "modify_panel";
@@ -42,7 +42,7 @@ $(function () {
     var passwordForm = document.forms.modify_password_form,
         oldPassword = passwordForm.old_password,
         password = passwordForm.password,
-        confirm =passwordForm.confirm_password;
+        confirm = passwordForm.confirm_password;
     
     $(passwordForm).submit(function (event) {
         if (oldPassword.value === "") {

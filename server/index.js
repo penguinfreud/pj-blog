@@ -78,9 +78,10 @@ function (req, res, next) {
 
 app.get("/blog/:uid/entry/:blog_id",
         [db.getUser,
-        db.getSingleBlog,
         db.getSingleCategory,
-        db.getComments],
+        db.getComments,
+        db.increaseReadCount],
+        db.getSingleBlog,
         [db.getPrevBlog,
         db.getNextBlog],
     function (req, res, next) {
@@ -127,7 +128,18 @@ app.get("/blog/:uid/delete/:blog_id", ifLogged, db.checkPrivil, db.deleteBlog,
         res.redirect("/blog/" + req.params.uid);
     });
 
-app.post("/blog/:uid/entry/:blog_id/post_comment", bodyParser, db.postComment,
+app.post("/blog/:uid/entry/:blog_id/post_comment", bodyParser,
+    db.postComment,
+    db.incComment,
+    function (req, res, next) {
+        res.redirect("/blog/" + req.params.uid + "/entry/" + req.params.blog_id);
+    });
+
+app.get("/blog/:uid/entry/:blog_id/delete_comment/:comment_id",
+    ifLogged,
+    db.checkPrivil,
+    db.deleteComment,
+    db.decComment,
     function (req, res, next) {
         res.redirect("/blog/" + req.params.uid + "/entry/" + req.params.blog_id);
     });
