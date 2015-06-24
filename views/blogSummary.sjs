@@ -33,7 +33,7 @@ exports.run = View(req, blog, type) {
         var tags = blog.tags, i, l = tags.length;
         for (i = 0; i<l; i++) {
             @' ';
-            a (href=path + '/tag/' + tags[i].id) {
+            a (href=path + '/tag/' + encodeURIComponent(tags[i].name)) {
                 @tags[i].name;
             }
         }

@@ -116,3 +116,7 @@
     margin-top: 0;
     margin-bottom: 0;
 }
+
+#categories li.current {
+    background-color: rgba(0, 0, 20, 0.15);
+}

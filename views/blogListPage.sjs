@@ -1,9 +1,10 @@
 var view = require("../server/view"),
     lib = view.require("lib");
 
-exports.run = View(req) {
+exports.run = View(req, type) {
     var path = '/blog/' + req.user.id;
     var body = @{
+        @lib.script('/scripts/jquery-2.1.4.min.js');
         a#post_blog.align_right (href='/edit') {
             @'发博文';
         }
@@ -14,7 +15,32 @@ exports.run = View(req) {
         div#body_right {
             div#articlelist.panel {
                 div.panel_title {
-                    @'全部博文';
+                    if (type === 1) {
+                        @'全部博文';
+                    } else if (type === 2) {
+                        var categoryName = lib.getCategoryName(req.categories, parseInt(req.params.category_id));
+                        @'分类：';
+                        @categoryName;
+                        div.align_right {
+                            a#rename_category (href='#') {
+                                @'重命名';
+                            }
+                            @' ';
+                            a (href='/delete_category/' + req.params.category_id) {
+                                @'删除';
+                            }
+                        }
+                        script {
+                            @'var categoryId=';
+                            @req.params.category_id;
+                            @',categoryName=';
+                            @JSON.stringify(categoryName);
+                        }
+                        @lib.script('/scripts/category.js');
+                    } else if (type === 3) {
+                        @'标签：';
+                        @req.params.tag;
+                    }
                 }
                 div.panel_content {
                     ul#article_list_compact {

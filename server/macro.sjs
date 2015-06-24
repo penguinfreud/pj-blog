@@ -59,9 +59,9 @@ macro stmt {
         output.push('<', $name $id $class $attrList , ' />');
     }
     rule {
-        if $a { $b:stmt ... } else { $c:stmt ... }
+        if $a { $b:stmt ... } else $c:stmt
     } => {
-        if $a { $b ... } else { $c ... }
+        if $a { $b ... } else { $c }
     }
     rule {
         if $a { $b:stmt ... }

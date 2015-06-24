@@ -50,6 +50,7 @@ exports.run = View(req) {
                         }
                     }
                     div.blog_post_comment {
+                        div.alert {}
                         form#comment_form (action=path + '/entry/' +
                             req.params.blog_id + '/post_comment',
                             method='POST') {

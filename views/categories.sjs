@@ -1,6 +1,6 @@
 exports.run = View(req) {
     ## {
-        var c = req.categories, i, l = c.length, sum = 0;
+        var c = req.categories, i, l = c.length, sum = 0, className;
         for (i = 0; i<l; i++) {
             sum += c[i].blog_count;
         }
@@ -22,7 +22,14 @@ exports.run = View(req) {
                     }
                 }
                 for (i = 0; i<l; i++) {
-                    li {
+                    ## {
+                        if (c[i].id === parseInt(req.params.category_id)) {
+                            className = ' class="current"';
+                        } else {
+                            className = "";
+                        }
+                    }
+                    li (className) {
                         a (href='/blog/' + req.user.id + '/category/' + c[i].id) {
                             @c[i].name;
                         }

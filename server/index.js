@@ -38,7 +38,11 @@ app.use(session({
 
 app.use(express.static(__dirname + "/../public"));
 
-app.get("/", db.getBlogs(1, 1, 10),
+app.get("/", db.getBlogs({
+        allUser: 1,
+        hasContent: 1,
+        count: 10
+    }),
     [db.getAuthors, db.getBlogCategories],
     function (req, res, next) {
         res.send(view.render("index", req));
@@ -58,19 +62,42 @@ app.get("/blog", function (req, res, next) {
 
 app.get("/blog/:uid",
     [db.getUser,
-    db.getBlogs(0, 1, 10),
+    db.getBlogs({
+        hasContent: 1,
+        count: 10
+    }),
     getCategories],
 function (req, res, next) {
     res.send(view.render("userIndex", req));
 });
 
-app.get("/blog/:uid/category/:category_id", function (req, res, next) {
-    res.send("category " + req.params.category_id);
+app.get("/blog/:uid/category/:category_id",
+    [db.getUser, db.getBlogs({
+        hasContent: 0,
+        count: 20,
+        category: 1
+    }),
+    getCategories],
+function (req, res, next) {
+    res.send(view.render("blogListPage", req, 2));
+});
+
+app.get("/blog/:uid/tag/:tag", [db.getUser, db.getBlogs({
+        hasContent: 0,
+        count: 20,
+        tag: 1
+    }),
+    getCategories],
+function (req, res, next) {
+    res.send(view.render("blogListPage", req, 3));
 });
 
 app.get("/blog/:uid/blog_list",
     [db.getUser,
-    db.getBlogs(0, 0, 20),
+    db.getBlogs({
+        hasContent: 0,
+        count: 20
+    }),
     getCategories],
 function (req, res, next) {
     res.send(view.render("blogListPage", req));
@@ -87,10 +114,6 @@ app.get("/blog/:uid/entry/:blog_id",
     function (req, res, next) {
         res.send(view.render("blog", req));
     });
-
-app.get("/blog/:uid/tag/:tag_id", function (req, res, next) {
-    res.send("tag " + req.params.blog_id);
-});
 
 app.get("/edit", ifLogged, getCategories2, function (req, res, next) {
     req.user = req.session.user;
@@ -145,6 +168,13 @@ app.get("/blog/:uid/entry/:blog_id/delete_comment/:comment_id",
     });
 
 app.post("/create_category", ifLogged, bodyParser, db.createCategory);
+app.post("/rename_category", ifLogged, bodyParser, db.renameCategory);
+app.get("/delete_category/:category_id", ifLogged,
+    function (req, res, next) {
+        req.body = {};
+        next();
+    },
+    db.getDefaultCategory, db.deleteCategory);
 
 var redirectAccount = function (req, res, next) {
     res.redirect("/account");

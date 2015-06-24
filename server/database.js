@@ -27,7 +27,7 @@ exports.getUser = function (req, res, next) {
     });
 };
 
-exports.getBlogs = function (allUser, hasContent, count) {
+exports.getBlogs = function (options) {
     return function (req, res, next) {
         var start = parseInt(req.query.start);
         if (!isFinite(start) || start < 0) {
@@ -35,13 +35,28 @@ exports.getBlogs = function (allUser, hasContent, count) {
         }
         req.start = start;
         
-        var where = allUser? "": " where uid=?"
+        var where = [], params = [];
+        if (!options.allUser) {
+            where.push("uid=?");
+            params.push(req.params.uid);
+        }
+        if (options.category) {
+            where.push("category=?");
+            params.push(req.params.category_id);
+        }
+        if (options.tag) {
+            where.push("(?, id) in (select name, blog_id from tags)");
+            params.push(req.params.tag);
+        }
+        if (where.length > 0) {
+            where = " where " + where.join(" and ");
+        }
+        params.push(options.count, start);
         
         conn.query("select id, uid, title" +
-            (hasContent? ", substr(content, 1, 250) as content": "") +
+            (options.hasContent? ", substr(content, 1, 250) as content": "") +
             ", created_time, category, read_count, like_count, comment_count from blogs" + where +
-            " order by created_time desc limit ? offset ?",
-        allUser? [count, start]: [req.params.uid, count, start],
+            " order by created_time desc limit ? offset ?", params,
         function (err, rows) {
             if (err) {
                 next(err);
@@ -121,6 +136,20 @@ exports.getBlogCategories = function (req, res, next) {
     }
 };
 
+exports.getDefaultCategory = function (req, res, next) {
+    conn.query("select id from categories where uid=? and name=?",
+        [req.session.user.id, "默认分类"], function (err, rows) {
+            if (err) {
+                next(err);
+            } else if (rows.length === 1) {
+                req.body.category = rows[0].id;
+                next();
+            } else {
+                next(new Error("No proper category"));
+            }
+        });
+};
+
 exports.getCategories = function (uid, req, res, next) {
     conn.query("select * from categories where uid=?",
         [uid], function (err, rows) {
@@ -139,7 +168,7 @@ exports.createCategory = function (req, res, next) {
         conn.execute("insert into categories (uid, name) values (?, ?)",
         [req.session.user.id, name], function (err, result) {
             if (err) {
-                console.log(e.stack);
+                console.error(err.stack);
                 res.send();
             } else {
                 res.send("" + result.insertId);
@@ -148,6 +177,54 @@ exports.createCategory = function (req, res, next) {
     } else {
         res.send();
     }
+};
+
+exports.renameCategory = function (req, res, next) {
+    var name = req.body.name;
+    if (name) {
+        conn.execute("update categories set name=? where id=? and uid=?",
+        [name, req.body.id, req.session.user.id], function (err, result) {
+            if (err) {
+                console.error(err.stack);
+            }
+            res.send();
+        });
+    } else {
+        res.send();
+    }
+};
+
+exports.deleteCategory = function (req, res, next) {
+    var category = req.params.category_id;
+    conn.query("select blog_count from categories where id=? and uid=?",
+    [category, req.session.user.id], function (err, rows) {
+        if (err) {
+            next(err);
+        } else if (rows.length === 1) {
+            var blogCount = rows[0].blog_count;
+            conn.execute("update categories set blog_count=blog_count+? where id=?",
+            [blogCount, req.body.category], function (err, result) {
+                if (err) {
+                    console.error(err.stack);
+                }
+            });
+            conn.execute("update blogs set category=? where category=?",
+            [req.body.category, category], function (err, result) {
+                if (err) {
+                    next(err);
+                } else {
+                    conn.execute("delete from categories where id=?",
+                        [category], function (err, result) {
+                            if (err) {
+                                next(err);
+                            } else {
+                                res.redirect("/blog/" + req.session.user.id + "/blog_list");
+                            }
+                        });
+                }
+            });
+        }
+    });
 };
 
 exports.getSingleBlog = function (req, res, next) {
@@ -365,17 +442,7 @@ exports.checkCategory = function (req, res, next) {
         } else if (rows.length === 1) {
             next();
         } else {
-            conn.query("select id from categories where uid=? and name=?",
-                [uid, "默认分类"], function (err, rows) {
-                    if (err) {
-                        next(err);
-                    } else if (rows.length === 1) {
-                        req.body.category = rows[0].id;
-                        next();
-                    } else {
-                        next(new Error("No proper category"));
-                    }
-                });
+            exports.getDefaultCategory(req, res, next);
         }
     });
 };

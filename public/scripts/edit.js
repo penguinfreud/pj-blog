@@ -16,7 +16,6 @@ $(function () {
         var name = input.value;
         
         panel.className = "";
-        input.value = "";
         event.preventDefault();
         
         if (!validateNotEmpty("分类名", input, event)) {
@@ -33,6 +32,8 @@ $(function () {
                 }
             });
         }
+        
+        input.value = "";
     });
     
     $("#create_category_cancel").click(function (event) {
