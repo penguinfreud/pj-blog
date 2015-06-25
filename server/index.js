@@ -198,7 +198,7 @@ app.post("/modify_description", ifLogged, bodyParser, db.modifyDescription, redi
 require("./account").init(app);
 
 app.use(function (req, res, next) {
-    res.status(404).send("Not Found");
+    res.status(404).send("<html><body><h1>404</h1><h3>您要找的页面不存在</h3></body></html>");
 });
 
 app.listen(8080);

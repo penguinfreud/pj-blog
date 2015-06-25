@@ -8,6 +8,7 @@ exports.run = View(req) {
         @lib.jquery(req);
         @lib.del(req);
         @lib.script('/scripts/blog.js');
+        @lib.script('/scripts/validate.js');
         div#articlelist.panel {
             div.panel_title {
                 @'博文';
@@ -52,13 +53,13 @@ exports.run = View(req) {
                         }
                     }
                     div.blog_post_comment {
-                        div.alert {}
                         form#comment_form (action=path + '/entry/' +
                             req.params.blog_id + '/post_comment',
                             method='POST') {
                             h3 {
                                 @'发评论';
                             }
+                            div.alert {}
                             div {
                                 textarea (name='content') {}
                             }

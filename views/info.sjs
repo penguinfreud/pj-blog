@@ -1,3 +1,6 @@
+var view = require("../server/view"),
+    lib = view.require("lib");
+
 exports.run = View(req) {
     var user = req.user;
     div#info.panel {
@@ -13,7 +16,7 @@ exports.run = View(req) {
             }
             div.hr {}
             div.info_intro {
-                @user.description;
+                @lib.processContent(user.description || '');
             }
         }
     }

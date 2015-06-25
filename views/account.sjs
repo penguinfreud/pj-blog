@@ -8,7 +8,7 @@ exports.run = View(req) {
             @lib.title(user.username + ' 的账户');
             @lib.style('/css/ui.css');
             @lib.style('/css/account.css');
-            @lib.script('/scripts/jquery-2.1.4.min.js');
+            @lib.jquery(req);
             @lib.script('/scripts/validate.js');
             @lib.script('/scripts/account.js');
         }
@@ -26,6 +26,7 @@ exports.run = View(req) {
                     form#modify_icon_form (action='/modify_icon', method='POST', enctype='multipart/form-data') {
                         span.modify_panel {
                             span {
+                                div.alert {}
                                 @'选择头像：';
                                 input (type='file', name='icon', accept='image/jpg, image/jpeg, image/gif, image/png, image/bmp');
                                 @' ';
@@ -45,10 +46,11 @@ exports.run = View(req) {
                     }
                 }
                 div.field.nickname {
-                    @'昵称：';
                     form#modify_nickname_form (action='/modify_nickname', method='POST') {
                         span.modify_panel {
                             span {
+                                div.alert {}
+                                @'昵称：';
                                 input (type='text', name='nickname', value=user.nickname);
                                 @' ';
                                 input.button.ok (type='submit', value='确认');
@@ -57,6 +59,7 @@ exports.run = View(req) {
                                 }
                             }
                             span.toggle {
+                                @'昵称：';
                                 @user.nickname;
                                 @' ';
                                 a.modify (href='#', 'data-type'='nickname') {
@@ -69,6 +72,7 @@ exports.run = View(req) {
                 div.field.password {
                     form#modify_password_form (action='/modify_password', method='POST') {
                         span.modify_panel {
+                            div.alert {}
                             div {
                                 label {
                                     @'旧密码：';
@@ -109,8 +113,9 @@ exports.run = View(req) {
                     form#modify_desc_form (action='/modify_description', method='POST') {
                         span.modify_panel {
                             div {
+                                div.alert {}
                                 textarea (name='description') {
-                                    @lib.unprocessContent(user.description || '');
+                                    @lib.escapeHTML(user.description || '');
                                 }
                                 br;
                                 input.button.ok (type='submit', value='确认');
@@ -123,7 +128,7 @@ exports.run = View(req) {
                                     @'修改';
                                 }
                                 div {
-                                    @user.description;
+                                    @lib.processContent(user.description || '');
                                 }
                             }
                         }

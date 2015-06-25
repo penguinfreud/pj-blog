@@ -14,7 +14,6 @@ exports.run = View(req) {
                 @blog? '编辑': '发博文';
             }
             div.panel_content {
-                div.alert {}
                 var action = blog? '/blog/' + blog.uid + '/edit/' + blog.id: '/post_blog';
                 form#edit_form (action=action, method='POST') {
                     @'标题：';

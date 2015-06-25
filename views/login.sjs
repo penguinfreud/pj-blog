@@ -1,7 +1,7 @@
 var view = require("../server/view"),
     lib = view.require("lib");
 
-exports.run = View(msg) {
+exports.run = View(msg, isSignup) {
     html {
         head {
             @lib.title('登录');
@@ -22,13 +22,15 @@ exports.run = View(msg) {
                 div#logo {}
             }
             div#input_container {
-                div.alert {
-                    @msg;
-                }
                 form#login_form (action='/login', method='POST') {
                     input (type='hidden', name='type', value='login');
                     div {
                         @'请输入您的帐号及密码';
+                    }
+                    div.alert {
+                        if (msg && !isSignup) {
+                            @msg;
+                        }
                     }
                     div.inputs {
                         div {
@@ -55,6 +57,11 @@ exports.run = View(msg) {
                     input (type='hidden', name='type', value='signup');
                     div {
                         @'注册新用户';
+                    }
+                    div.alert {
+                        if (msg && isSignup) {
+                            @msg;
+                        }
                     }
                     div.inputs {
                         div {

@@ -63,14 +63,10 @@ exports.formatTime = function (date) {
         pad(date.getSeconds())].join("");
 };
 
+exports.escapeHTML = escapeHTML;
+
 exports.processContent = function (content) {
     return "<p>" + escapeHTML(content).replace(/\r\n|\r|\n/g, "</p><p>") + "</p>";
-};
-
-exports.unprocessContent = function (content) {
-    content = String(content);
-    return content.substring(3, content.length - 4)
-        .replace(/<\/p><p>/g, "\n");
 };
 
 var hasPrivil = exports.hasPrivil = function (req, blog) {

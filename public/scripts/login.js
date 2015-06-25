@@ -6,7 +6,9 @@ $(function () {
         signupUsername = signupForm.username,
         signupNickname = signupForm.nickname,
         signupPassword = signupForm.password,
-        signupConfirm = signupForm.confirm_password;
+        signupConfirm = signupForm.confirm_password,
+        loginAlert = $(".alert", loginForm)[0],
+        signupAlert = $(".alert", signupForm)[0];
     
     var toggle = $("#toggle").click(function () {
         if (document.body.className === "") {
@@ -48,15 +50,15 @@ $(function () {
     
     $(loginForm).submit(function (event) {
         save();
-        validateNotEmpty("用户名", loginUsername, event) ||
-            validateNotEmpty("密码", loginPassword, event);
+        validateNotEmpty("用户名", loginUsername, event, loginAlert) ||
+            validateNotEmpty("密码", loginPassword, event, loginAlert);
     });
     
     $(signupForm).submit(function (event) {
         save();
-        validateNewUsername(signupUsername, event) ||
-            validateNotEmpty("昵称", signupNickname, event) ||
-            validateNewPassword(signupPassword, signupConfirm, event);
+        validateNewUsername(signupUsername, event, signupAlert) ||
+            validateNotEmpty("昵称", signupNickname, event, signupAlert) ||
+            validateNewPassword(signupPassword, signupConfirm, event, signupAlert);
     });
     
     $(window).on("beforeunload", save);

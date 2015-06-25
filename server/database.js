@@ -584,7 +584,7 @@ exports.login = function (req, res, next) {
                 req.session.user = rows[0];
                 res.redirect("/");
             } else {
-                res.send(view.render("login", "用户名或密码错误"));
+                res.send(view.render("login", "用户名或密码错误", false));
             }
         });
 };
@@ -596,7 +596,7 @@ exports.signup = function (req, res, next) {
             if (err) {
                 next(err);
             } else if (rows.length > 0) {
-                res.send(view.render("login", "该用户名已被注册"));
+                res.send(view.render("login", "该用户名已被注册", true));
             } else {
                 conn.execute("insert into users (username, password, nickname, type) values (?, password(?), ?, 1)",
                 [body.username, body.password, body.nickname],
