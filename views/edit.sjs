@@ -6,7 +6,7 @@ exports.run = View(req) {
     var blog = req.blog, i, l;
     var body = @{
         @lib.style('/css/edit.css');
-        @lib.script('/scripts/jquery-2.1.4.min.js');
+        @lib.jquery(req);
         @lib.script('/scripts/edit.js');
         @lib.script('/scripts/validate.js');
         div#edit_blog.panel {

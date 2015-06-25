@@ -25,11 +25,20 @@ var ifLogged = function (req, res, next) {
     }
 };
 
+var goto = function (req, res, defaultRoute) {
+    if (req.query.goto === "/" || /^\/\w/.test(req.query.goto)) {
+        res.redirect(req.query.goto);
+    } else {
+        res.redirect(defaultRoute);
+    }
+};
+
 var bodyParser = require("body-parser").urlencoded({ extended: false });
 
 app.set("ifUnlogged", ifUnlogged);
 app.set("ifLogged", ifLogged);
 app.set("bodyParser", bodyParser);
+app.set("goto", goto);
 
 app.use(session({
     name: "s",
@@ -148,7 +157,7 @@ app.post("/blog/:uid/edit/:blog_id", ifLogged, bodyParser,
 
 app.get("/blog/:uid/delete/:blog_id", ifLogged, db.checkPrivil, db.deleteBlog,
     function (req, res, next) {
-        res.redirect("/blog/" + req.params.uid);
+        goto(req, res, "/blog/" + req.params.uid);
     });
 
 app.post("/blog/:uid/entry/:blog_id/post_comment", bodyParser,

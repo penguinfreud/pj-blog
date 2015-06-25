@@ -7,7 +7,7 @@ exports.run = View(msg) {
             @lib.title('登录');
             @lib.style('/css/login.css');
             @lib.style('/css/ui.css');
-            @lib.script('/scripts/jquery-2.1.4.min.js');
+            @lib.jquery({});
             @lib.script('/scripts/cookie.js');
             @lib.script('/scripts/validate.js');
             @lib.script('/scripts/login.js');

@@ -1,5 +1,23 @@
 var escapeHTML = require("escape-html");
 
+exports.jquery = function (req) {
+    if (!req.jquery) {
+        req.jquery = true;
+        return '<script src="/scripts/jquery-2.1.4.min.js"></script>';
+    } else {
+        return '';
+    }
+};
+
+exports.del = function (req) {
+    if (!req.deleteJS) {
+        req.deleteJS = true;
+        return '<script src="/scripts/delete.js"></script>';
+    } else {
+        return '';
+    }
+};
+
 exports.script = function (src) {
     return '<script src="' + src + '"></script>';
 };
@@ -70,7 +88,10 @@ exports.blogOperations = View(req, blog, separator) {
             }
             @separator;
         }
-        a.delete_blog (href='/blog/' + blog.uid + "/delete/" + blog.id) {
+        @exports.jquery(req);
+        @exports.del(req);
+        a.del (href='/blog/' + blog.uid + "/delete/" + blog.id + "?goto=" + req.url,
+            'data-obj'='《' + blog.title + '》') {
             @'删除';
         }
     }
@@ -103,24 +124,27 @@ exports.toolbar = View(req) {
 };
 
 exports.pagination = View(req) {
-    div {
-        if (req.start > 0) {
-            a (href='?p=' + Math.max(req.start - req.itemsPerPage, 0)) {
-                @'&lt;前页';
+    var hasPrev = req.start > 0, hasNext = req.blogs.length === req.itemsPerPage;
+    if (hasPrev || hasNext) {
+        div {
+            if (hasPrev) {
+                a (href='?p=' + Math.max(req.start - req.itemsPerPage, 0)) {
+                    @'&lt;前页';
+                }
+            } else {
+                span.disabled {
+                    @'&lt;前页';
+                }
             }
-        } else {
-            span.disabled {
-                @'&lt;前页';
-            }
-        }
-        @' ';
-        if (req.blogs.length === req.itemsPerPage) {
-            a (href='?p=' + (req.start + req.itemsPerPage)) {
-                @'后页&gt;';
-            }
-        } else {
-            span.disabled {
-                @'后页&gt;';
+            @' ';
+            if (hasNext) {
+                a (href='?p=' + (req.start + req.itemsPerPage)) {
+                    @'后页&gt;';
+                }
+            } else {
+                span.disabled {
+                    @'后页&gt;';
+                }
             }
         }
     }

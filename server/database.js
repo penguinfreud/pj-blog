@@ -183,12 +183,26 @@ exports.createCategory = function (req, res, next) {
 exports.renameCategory = function (req, res, next) {
     var name = req.body.name;
     if (name) {
-        conn.execute("update categories set name=? where id=? and uid=?",
-        [name, req.body.id, req.session.user.id], function (err, result) {
+        conn.query("select name from categories where id=? and uid=?",
+        [req.body.id, req.session.user.id], function (err, rows) {
             if (err) {
-                console.error(err.stack);
+                next(err);
+            } else if (rows.length === 1) {
+                if (rows[0].name === "默认分类") {
+                    res.send();
+                } else {
+                    conn.execute("update categories set name=? where id=?",
+                    [name, req.body.id], function (err, result) {
+                        if (err) {
+                            next(err);
+                        } else {
+                            res.send();
+                        }
+                    });
+                }
+            } else {
+                res.send();
             }
-            res.send();
         });
     } else {
         res.send();
@@ -197,33 +211,37 @@ exports.renameCategory = function (req, res, next) {
 
 exports.deleteCategory = function (req, res, next) {
     var category = req.params.category_id;
-    conn.query("select blog_count from categories where id=? and uid=?",
+    conn.query("select name, blog_count from categories where id=? and uid=?",
     [category, req.session.user.id], function (err, rows) {
         if (err) {
             next(err);
         } else if (rows.length === 1) {
-            var blogCount = rows[0].blog_count;
-            conn.execute("update categories set blog_count=blog_count+? where id=?",
-            [blogCount, req.body.category], function (err, result) {
-                if (err) {
-                    console.error(err.stack);
-                }
-            });
-            conn.execute("update blogs set category=? where category=?",
-            [req.body.category, category], function (err, result) {
-                if (err) {
-                    next(err);
-                } else {
-                    conn.execute("delete from categories where id=?",
-                        [category], function (err, result) {
-                            if (err) {
-                                next(err);
-                            } else {
-                                res.redirect("/blog/" + req.session.user.id + "/blog_list");
-                            }
-                        });
-                }
-            });
+            if (rows[0].name === "默认分类") {
+                next(new Error("不能删除默认分类"));
+            } else {
+                var blogCount = rows[0].blog_count;
+                conn.execute("update categories set blog_count=blog_count+? where id=?",
+                [blogCount, req.body.category], function (err, result) {
+                    if (err) {
+                        console.error(err.stack);
+                    }
+                });
+                conn.execute("update blogs set category=? where category=?",
+                [req.body.category, category], function (err, result) {
+                    if (err) {
+                        next(err);
+                    } else {
+                        conn.execute("delete from categories where id=?",
+                            [category], function (err, result) {
+                                if (err) {
+                                    next(err);
+                                } else {
+                                    res.redirect("/blog/" + req.session.user.id + "/blog_list");
+                                }
+                            });
+                    }
+                });
+            }
         }
     });
 };

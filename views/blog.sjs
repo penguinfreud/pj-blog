@@ -5,7 +5,8 @@ exports.run = View(req) {
     var path = '/blog/' + req.params.uid;
     var body = @{
         @lib.style('/css/blog.css');
-        @lib.script('/scripts/jquery-2.1.4.min.js');
+        @lib.jquery(req);
+        @lib.del(req);
         @lib.script('/scripts/blog.js');
         div#articlelist.panel {
             div.panel_title {
@@ -40,7 +41,8 @@ exports.run = View(req) {
                                     if (hasPrivil) {
                                         span.comment_operations {
                                             a.del (href=path + '/entry/' + req.blog.id +
-                                                '/delete_comment/' + comment.id) {
+                                                '/delete_comment/' + comment.id,
+                                                'data-obj'=comment.name + '的评论') {
                                                 @'删除';
                                             }
                                         }

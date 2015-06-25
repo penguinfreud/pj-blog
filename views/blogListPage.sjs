@@ -4,7 +4,8 @@ var view = require("../server/view"),
 exports.run = View(req, type) {
     var path = '/blog/' + req.user.id;
     var body = @{
-        @lib.script('/scripts/jquery-2.1.4.min.js');
+        @lib.jquery(req);
+        @lib.del(req);
         a#post_blog.align_right (href='/edit') {
             @'发博文';
         }
@@ -21,22 +22,24 @@ exports.run = View(req, type) {
                         var categoryName = lib.getCategoryName(req.categories, parseInt(req.params.category_id));
                         @'分类：';
                         @categoryName;
-                        div.align_right {
-                            a#rename_category (href='#') {
-                                @'重命名';
+                        if (categoryName !== '默认分类') {
+                            div.align_right {
+                                a#rename_category (href='#') {
+                                    @'重命名';
+                                }
+                                @' ';
+                                a.del (href='/delete_category/' + req.params.category_id, 'data-obj'='分类' + categoryName) {
+                                    @'删除';
+                                }
                             }
-                            @' ';
-                            a (href='/delete_category/' + req.params.category_id) {
-                                @'删除';
+                            script {
+                                @'var categoryId=';
+                                @req.params.category_id;
+                                @',categoryName=';
+                                @JSON.stringify(categoryName);
                             }
+                            @lib.script('/scripts/category.js');
                         }
-                        script {
-                            @'var categoryId=';
-                            @req.params.category_id;
-                            @',categoryName=';
-                            @JSON.stringify(categoryName);
-                        }
-                        @lib.script('/scripts/category.js');
                     } else if (type === 3) {
                         @'标签：';
                         @req.params.tag;

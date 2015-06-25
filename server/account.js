@@ -28,11 +28,7 @@ exports.init = function (app) {
             res.redirect("/login");
         } else {
             req.session.user = null;
-            if (/^\/[a-z]/i.test(req.query.goto)) {
-                res.redirect(req.query.goto);
-            } else {
-                res.redirect("/");
-            }
+            app.get("goto")(req, res, "/");
         }
     });
     
