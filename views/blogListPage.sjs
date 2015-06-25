@@ -12,6 +12,7 @@ exports.run = View(req, type) {
         div.clear {}
         div#body_left {
             @view.render("categories", req);
+            @view.render("searchBox", req);
         }
         div#body_right {
             div#articlelist.panel {
@@ -24,11 +25,11 @@ exports.run = View(req, type) {
                         @categoryName;
                         if (categoryName !== '默认分类') {
                             div.align_right {
-                                a#rename_category (href='#') {
+                                a#rename_category.f (href='#') {
                                     @'重命名';
                                 }
                                 @' ';
-                                a.del (href='/delete_category/' + req.params.category_id, 'data-obj'='分类' + categoryName) {
+                                a.f.del (href='/delete_category/' + req.params.category_id, 'data-obj'='分类' + categoryName) {
                                     @'删除';
                                 }
                             }
@@ -37,6 +38,7 @@ exports.run = View(req, type) {
                                 @req.params.category_id;
                                 @',categoryName=';
                                 @JSON.stringify(categoryName);
+                                @';';
                             }
                             @lib.script('/scripts/category.js');
                         }
@@ -64,7 +66,7 @@ exports.run = View(req, type) {
                             }
                         }
                     }
-                    @lib.pagination(req);
+                    @lib.pagination(req.blogsPaging);
                 }
             }
         }

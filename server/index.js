@@ -33,12 +33,17 @@ var goto = function (req, res, defaultRoute) {
     }
 };
 
+var notFound = function (req, res, next) {
+    res.status(404).send("<html><body><h1>404</h1><h3>您要找的页面不存在</h3></body></html>");
+};
+
 var bodyParser = require("body-parser").urlencoded({ extended: false });
 
 app.set("ifUnlogged", ifUnlogged);
 app.set("ifLogged", ifLogged);
 app.set("bodyParser", bodyParser);
 app.set("goto", goto);
+app.set("notFound", notFound);
 
 app.use(session({
     name: "s",
@@ -200,8 +205,17 @@ app.post("/modify_description", ifLogged, bodyParser, db.modifyDescription, redi
 
 require("./account");
 
-app.use(function (req, res, next) {
-    res.status(404).send("<html><body><h1>404</h1><h3>您要找的页面不存在</h3></body></html>");
-});
+var renderSearch = function (req, res, next) {
+    res.send(view.render("search", req));
+};
+
+app.get("/search", db.getSearchUser, renderSearch);
+app.post("/search", bodyParser,
+    db.getSearchUser,
+    db.search,
+    [db.getAuthors, db.getBlogCategories],
+    renderSearch);
+
+app.use(notFound);
 
 app.listen(8080);

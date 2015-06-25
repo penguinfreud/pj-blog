@@ -31,14 +31,14 @@ exports.run = View(req) {
                                 input (type='file', name='icon', accept='image/jpg, image/jpeg, image/gif, image/png, image/bmp');
                                 @' ';
                                 input.button.ok (type='submit', value='确认');
-                                a.button.cancel (href='#') {
+                                a.f.button.cancel (href='#') {
                                     @'取消';
                                 }
                             }
                             span.toggle {
                                 img (src='/icons/'+user.icon, alt=user.nickname, title=user.nickname);
                                 br;
-                                a.modify (href='#', 'data-type'='icon') {
+                                a.f.modify (href='#', 'data-type'='icon') {
                                     @'修改头像';
                                 }
                             }
@@ -54,7 +54,7 @@ exports.run = View(req) {
                                 input (type='text', name='nickname', value=user.nickname);
                                 @' ';
                                 input.button.ok (type='submit', value='确认');
-                                a.button.cancel (href='#') {
+                                a.f.button.cancel (href='#') {
                                     @'取消';
                                 }
                             }
@@ -62,7 +62,7 @@ exports.run = View(req) {
                                 @'昵称：';
                                 @user.nickname;
                                 @' ';
-                                a.modify (href='#', 'data-type'='nickname') {
+                                a.f.modify (href='#', 'data-type'='nickname') {
                                     @'修改';
                                 }
                             }
@@ -96,12 +96,12 @@ exports.run = View(req) {
                             }
                             div {
                                 input.button.ok (type='submit', value='确认');
-                                a.button.cancel (href='#') {
+                                a.f.button.cancel (href='#') {
                                     @'取消';
                                 }
                             }
                             span.toggle {
-                                a.modify (href='#', 'data-type'='password') {
+                                a.f.modify (href='#', 'data-type'='password') {
                                     @'修改密码';
                                 }
                             }
@@ -119,12 +119,12 @@ exports.run = View(req) {
                                 }
                                 br;
                                 input.button.ok (type='submit', value='确认');
-                                a.button.cancel (href='#') {
+                                a.f.button.cancel (href='#') {
                                     @'取消';
                                 }
                             }
                             span.toggle {
-                                a.modify (href='#', 'data-type'='description') {
+                                a.f.modify (href='#', 'data-type'='description') {
                                     @'修改';
                                 }
                                 div {

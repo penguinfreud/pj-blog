@@ -105,7 +105,11 @@
 }
 
 #search_input {
-    width: 130px;
+    width: 160px;
+}
+
+#long_search_input {
+    width: 820px;
 }
 
 #post_blog {

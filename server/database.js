@@ -17,7 +17,7 @@ exports.getUser = function (req, res, next) {
         if (err) {
             next(err);
         } else if (rows.length === 0) {
-            res.status(404).send("Not Found");
+            app.get("notFound")(req, res, next);
         } else {
             req.user = rows[0];
             next();
@@ -25,25 +25,21 @@ exports.getUser = function (req, res, next) {
     });
 };
 
-exports.getBlogCategories = function (req, res, next) {
-    var blogs = req.blogs, i, l = blogs.length, categories = [], category;
-    if (l > 0) {
-        for (i = 0; i<l; i++) {
-            category = blogs[i].category;
-            if (categories.indexOf(category) === -1) {
-                categories.push(category);
+exports.getSearchUser = function (req, res, next) {
+    if (req.query.uid) {
+        conn.query("select id, nickname from users where id=?",
+        [req.query.uid], function (err, rows) {
+            if (err) {
+                next(err);
+            } else if (rows.length === 0) {
+                res.redirect("/search");
+            } else {
+                req.user = rows[0];
+                next();
             }
-        }
-        conn.query("select id, name from categories where id in (?" +
-            new Array(categories.length).join(", ?") + ")",
-            categories, function (err, rows) {
-                if (err) {
-                    next(err);
-                } else {
-                    req.categories = rows;
-                    next();
-                }
-            });
+        });
+    } else {
+        next();
     }
 };
 
@@ -122,3 +118,4 @@ require("./db/comments");
 require("./db/blogs");
 require("./db/account");
 require("./db/likes");
+require("./db/search");

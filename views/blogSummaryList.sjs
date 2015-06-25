@@ -13,7 +13,7 @@ exports.run = View(req, allUser) {
                     @view.render("blogSummary", req, b[i], allUser? 2: 0);
                 }
             }
-            @lib.pagination(req);
+            @lib.pagination(req.blogsPaging);
         }
     }
 };

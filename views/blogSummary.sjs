@@ -50,30 +50,24 @@ exports.run = View(req, blog, type) {
     }
     div.blog_operations {
         if (type === 1) {
-            span {
-                @'阅读('; @blog.read_count; @')';
-            }
+            @'阅读';
         } else {
-            a (href=blogPath) {
-                @'阅读('; @blog.read_count; @')';
+            a.f (href=blogPath) {
+                @'阅读';
             }
         }
-        @' | ';
-        a (href=blogPath + '#comments') {
-            @'评论('; @blog.comment_count; @')';
+        @'('; @blog.read_count; @') | ';
+        a.f (href=blogPath + '#comments') {
+            @'评论';
         }
-        @' | ';
+        @'('; @blog.comment_count; @') | ';
         if (req.session.user) {
             @lib.jquery(req);
             @lib.scriptOnce(req, '/scripts/like.js');
-            if (blog.liked) {
-                a.cancel_like (href='#', 'data-blogid'=blog.id) {
-                    @'已赞';
-                }
-            } else {
-                a.like (href='#', 'data-blogid'=blog.id) {
-                    @'赞';
-                }
+            a.f.cancel_like (href='#',
+                'class'=blog.liked? 'cancel_like': 'like',
+                'data-blogid'=blog.id) {
+                @(blog.liked? '已赞': '赞');
             }
         } else {
             @'赞';
@@ -83,7 +77,7 @@ exports.run = View(req, blog, type) {
         @lib.blogOperations(req, blog, ' | ');
         
         if (type !== 1) {
-            a.align_right (href=blogPath) {
+            a.f.align_right (href=blogPath) {
                 @'查看全文&gt;&gt;';
             }
         }

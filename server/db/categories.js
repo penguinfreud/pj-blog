@@ -111,7 +111,7 @@ db.deleteCategory = function (req, res, next) {
 };
 
 db.getSingleCategory = function (req, res, next) {
-    conn.query("select categories.* from categories, blogs where categories.id=blogs.category and blogs.id=?",
+    conn.query("select * from categories where id=(select category from blogs where id=?)",
     [req.params.blog_id], function (err, rows) {
         if (err) {
             next(err);

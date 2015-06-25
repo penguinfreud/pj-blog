@@ -3,24 +3,37 @@ escapeHTML = require("escape-html");
 var conn = db.connection;
 
 db.getComments = function (req, res, next) {
-    var start = parseInt(req.query.start);
+    var start = parseInt(req.query.p);
     if (!isFinite(start) || start < 0) {
         start = 0;
     }
-    req.commentsStart = start;
+    req.commentsPaging = {
+        start: start,
+        itemsPerPage: 50,
+        total: 0,
+        length: 0
+    };
     
-    conn.query("select * from comments where blog_id=? limit 50 offset ?",
-        [req.params.blog_id, start], function (err, rows) {
-            if (err) {
-                next(err);
-            } else {
-                req.comments = rows;
-                
-                var count = 0, total = 0;
-                rows.forEach(function (comment) {
-                    if (comment.uid) {
-                        total++;
-                        conn.query("select username from users where id=?",
+    conn.query("select count(*) as c from comments where blog_id=?",
+    [req.params.blog_id], function (err, rows) {
+        if (err) {
+            next(err);
+        } else {
+            req.commentsPaging.total = rows[0].c;
+            
+            conn.query("select * from comments where blog_id=? limit 50 offset ?",
+            [req.params.blog_id, start], function (err, rows) {
+                if (err) {
+                    next(err);
+                } else {
+                    req.comments = rows;
+                    req.commentsPaging.length = rows.length;
+                    
+                    var count = 0, total = 0;
+                    rows.forEach(function (comment) {
+                        if (comment.uid) {
+                            total++;
+                            conn.query("select username from users where id=?",
                             [comment.uid], function (err, rows) {
                                 if (err) {
                                     next(err);
@@ -35,13 +48,15 @@ db.getComments = function (req, res, next) {
                                     }
                                 }
                             });
+                        }
+                    });
+                    if (total === 0) {
+                        next();
                     }
-                });
-                if (total === 0) {
-                    next();
                 }
-            }
-        });
+            });
+        }
+    });
 };
 
 db.postComment = function (req, res, next) {

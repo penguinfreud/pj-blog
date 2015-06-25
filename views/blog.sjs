@@ -18,7 +18,7 @@ exports.run = View(req) {
                     @view.render("blogSummary", req, req.blog, 1);
                     div.blog_comments {
                         h3 {
-                            a (name='comments') {}
+                            a.f (name='comments') {}
                             @'评论';
                         }
                         var comments = req.comments,
@@ -40,7 +40,7 @@ exports.run = View(req) {
                                     }
                                     if (lib.hasCommentPrivil(req, req.blog, comment)) {
                                         span.comment_operations {
-                                            a.del (href=path + '/entry/' + req.blog.id +
+                                            a.f.del (href=path + '/entry/' + req.blog.id +
                                                 '/delete_comment/' + comment.id,
                                                 'data-obj'=comment.name + '的评论') {
                                                 @'删除';
@@ -50,6 +50,7 @@ exports.run = View(req) {
                                 }
                             }
                         }
+                        @lib.pagination(req.commentsPaging);
                     }
                     div.blog_post_comment {
                         form#comment_form (action=path + '/entry/' +

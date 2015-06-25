@@ -15,7 +15,7 @@ exports.run = View(msg, isSignup) {
         body {
             div#logo_wrapper {
                 div {
-                    a#toggle.align_right (href='#', onclick='return false;') {
+                    a#toggle.align_right.f (href='#', onclick='return false;') {
                         @'注册';
                     }
                 }

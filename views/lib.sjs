@@ -87,14 +87,14 @@ exports.blogOperations = View(req, blog, separator) {
     if (privil) {
         @separator;
         if (privil === 1) {
-            a.edit_blog (href='/blog/' + blog.uid + "/edit/" + blog.id) {
+            a.f.edit_blog (href='/blog/' + blog.uid + "/edit/" + blog.id) {
                 @'编辑';
             }
             @separator;
         }
         @exports.jquery(req);
         @exports.scriptOnce(req, '/scripts/delete.js');
-        a.del (href='/blog/' + blog.uid + "/delete/" + blog.id + "?goto=" + req.url,
+        a.f.del (href='/blog/' + blog.uid + "/delete/" + blog.id + "?goto=" + req.url,
             'data-obj'='《' + blog.title + '》') {
             @'删除';
         }
@@ -105,21 +105,26 @@ exports.toolbar = View(req) {
     div#toolbar {
         span {
             if (req.session.user) {
+                @'您好，';
                 @req.session.user.nickname;
                 @' ';
-                a (href='/blog/' + req.session.user.id) {
+                a.f (href='/') {
+                    @'首页';
+                }
+                @' ';
+                a.f (href='/blog/' + req.session.user.id) {
                     @'我的博客';
                 }
                 @' ';
-                a (href='/account') {
+                a.f (href='/account') {
                     @'我的账号';
                 }
                 @' ';
-                a (href='/logout?goto=' + req.url) {
+                a.f (href='/logout?goto=' + req.url) {
                     @'退出';
                 }
             } else {
-                a (href='/login?goto=' + req.url) {
+                a.f (href='/login?goto=' + req.url) {
                     @'登录';
                 }
             }
@@ -127,12 +132,14 @@ exports.toolbar = View(req) {
     }
 };
 
-exports.pagination = View(req) {
-    var hasPrev = req.start > 0, hasNext = req.blogs.length === req.itemsPerPage;
+exports.pagination = View(paging) {
+    var s = paging.start, ipp = paging.itemsPerPage, total = paging.total,
+    hasPrev = s > 0,
+    hasNext = paging.length === ipp;
     if (hasPrev || hasNext) {
         div {
             if (hasPrev) {
-                a (href='?p=' + Math.max(req.start - req.itemsPerPage, 0)) {
+                a.f (href='?p=' + Math.max(s - ipp, 0)) {
                     @'&lt;前页';
                 }
             } else {
@@ -140,9 +147,23 @@ exports.pagination = View(req) {
                     @'&lt;前页';
                 }
             }
+            var t = Math.floor(s/ipp),
+            l = Math.max((t - 5) * ipp, 0),
+            last = Math.floor(total / ipp),
+            u = Math.min((t + 6) * ipp, last);
+            for (; l<=u; l++) {
+                @' ';
+                if (l * ipp === s) {
+                    @(l + 1);
+                } else {
+                    a.f (href='?p=' + l * ipp) {
+                        @(l + 1);
+                    }
+                }
+            }
             @' ';
             if (hasNext) {
-                a (href='?p=' + (req.start + req.itemsPerPage)) {
+                a.f (href='?p=' + (s + ipp)) {
                     @'后页&gt;';
                 }
             } else {

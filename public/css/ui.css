@@ -2,11 +2,11 @@ body {
     background-color: #f9f9fd;
 }
 
-#header a:visited, a[href="#"]:visited, .blog_operations a:visited {
+a.f:visited {
     color: #269;
 }
 
-#header a:hover, a[href="#"]:hover, .blog_operations a:hover {
+a.f:hover {
     color: #fff;
 }
 

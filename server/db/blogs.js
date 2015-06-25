@@ -2,13 +2,13 @@ var db = require("../database"),
 escapeHTML = require("escape-html");
 var conn = db.connection;
 
+var push = Array.prototype.push;
 db.getBlogs = function (options) {
     return function (req, res, next) {
         var start = parseInt(req.query.p);
         if (!isFinite(start) || start < 0) {
             start = 0;
         }
-        req.start = start;
         
         var where = [], params = [];
         if (!options.allUser) {
@@ -23,32 +23,55 @@ db.getBlogs = function (options) {
             where.push("(?, id) in (select name, blog_id from tags)");
             params.push(req.params.tag);
         }
+        if (options.where) {
+            push.apply(where, options.where);
+        }
+        if (options.params) {
+            push.apply(params, options.params);
+        }
         if (where.length > 0) {
             where = " where " + where.join(" and ");
         }
-        params.push(options.itemsPerPage, start);
-        req.itemsPerPage = options.itemsPerPage;
         
-        conn.query("select id, uid, title" +
-            (options.hasContent? ", substr(content, 1, 250) as content": "") +
-            ", created_time, category, read_count, like_count, comment_count from blogs" + where +
-            " order by created_time desc limit ? offset ?", params,
+        req.blogsPaging = {
+            start: start,
+            itemsPerPage: options.itemsPerPage,
+            total: 0,
+            length: 0
+        };
+        
+        conn.query("select count(*) as c from blogs" + where, params,
         function (err, rows) {
             if (err) {
                 next(err);
             } else {
-                req.blogs = rows;
-                if (rows.length === 0) {
-                    next();
-                } else {
-                    var context = {
-                        total: rows.length,
-                        count: 0,
-                        next: next
-                    };
-                    rows.forEach(getBlogTags(context));
-                    rows.forEach(likeOrNot(req, context));
-                }
+                req.blogsPaging.total = rows[0].c;
+                params = params.concat(options.itemsPerPage, start);
+                var sql = "select id, uid, title" +
+                    (options.hasContent? ", substr(content, 1, 250) as content": "") +
+                    ", created_time, category, read_count, like_count, comment_count from blogs" + where +
+                    " order by created_time desc limit ? offset ?";
+                console.log(sql, params);
+                conn.query(sql, params,
+                function (err, rows) {
+                    if (err) {
+                        next(err);
+                    } else {
+                        req.blogs = rows;
+                        req.blogsPaging.length = rows.length;
+                        if (rows.length === 0) {
+                            next();
+                        } else {
+                            var context = {
+                                total: rows.length,
+                                count: 0,
+                                next: next
+                            };
+                            rows.forEach(getBlogTags(context));
+                            rows.forEach(likeOrNot(req, context));
+                        }
+                    }
+                });
             }
         });
     };
@@ -70,6 +93,7 @@ var getBlogTags = function (context) {
     };
 };
 
+var _void = function () {};
 var likeOrNot = function (req, context) {
     if (req.session.user) {
         context.total += context.total;
@@ -86,6 +110,8 @@ var likeOrNot = function (req, context) {
                     }
                 });
         };
+    } else {
+        return _void;
     }
 };
 
@@ -108,6 +134,32 @@ db.getAuthors = function (req, res, next) {
                     next();
                 }
             });
+    } else {
+        next();
+    }
+};
+
+db.getBlogCategories = function (req, res, next) {
+    var blogs = req.blogs, i, l = blogs.length, categories = [], category;
+    if (l > 0) {
+        for (i = 0; i<l; i++) {
+            category = blogs[i].category;
+            if (categories.indexOf(category) === -1) {
+                categories.push(category);
+            }
+        }
+        conn.query("select id, name from categories where id in (?" +
+            new Array(categories.length).join(", ?") + ")",
+            categories, function (err, rows) {
+                if (err) {
+                    next(err);
+                } else {
+                    req.categories = rows;
+                    next();
+                }
+            });
+    } else {
+        next();
     }
 };
 
@@ -117,7 +169,7 @@ db.getSingleBlog = function (req, res, next) {
         if (err) {
             next(err);
         } else if (rows.length === 0) {
-            res.status(404).send("Not Found");
+            app.get("notFound")(req, res, next);
         } else {
             req.blog = rows[0];
             var context = {

@@ -4,11 +4,11 @@ $(function () {
         $.get((isLike? "/like/": "/cancel_like/") + anchor.dataset.blogid, function () {
             var inc;
             if (isLike) {
-                anchor.className = "cancel_like";
+                anchor.className = "f cancel_like";
                 anchor.textContent = "已赞";
                 inc = 1;
             } else {
-                anchor.className = "like";
+                anchor.className = "f like";
                 anchor.textContent = "赞";
                 inc = -1;
             }

@@ -30,16 +30,18 @@ $(function () {
         document.title = "注册";
     }
     
-    $(".cancel", loginForm).click(function () {
+    $(".cancel", loginForm).click(function (event) {
         loginUsername.value = "";
         loginPassword.value = "";
+        event.preventDefault();
     });
     
-    $(".cancel", signupForm).click(function () {
+    $(".cancel", signupForm).click(function (event) {
         signupUsername.value = "";
         signupNickname.value = "";
         signupPassword.value = "";
         signupConfirm.value = "";
+        event.preventDefault();
     });
     
     var save = function () {

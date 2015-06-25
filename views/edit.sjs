@@ -42,13 +42,13 @@ exports.run = View(req) {
                     span#create_category_panel {
                         input#category_input (type='text');
                         @' ';
-                        a#create_category_ok.button (href='#') {
+                        a#create_category_ok.button.f (href='#') {
                             @'确认';
                         }
-                        a#create_category_cancel.button (href='#') {
+                        a#create_category_cancel.button.f (href='#') {
                             @'取消';
                         }
-                        a#create_category_btn.button (href='#') {
+                        a#create_category_btn.button.f (href='#') {
                             @'创建分类';
                         }
                     }
@@ -73,6 +73,7 @@ exports.run = View(req) {
         }
     };
     return view.render("layout", req, {
+        omitHeader: true,
         title: blog? '编辑 ' + blog.title: '发博文',
         body: body
     });
