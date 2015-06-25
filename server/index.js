@@ -185,7 +185,8 @@ app.get("/delete_category/:category_id", ifLogged,
     },
     db.getDefaultCategory, db.deleteCategory);
 
-app.get("/like/:blog_id", ifLogged, db.likeBlog);
+app.get("/like/:blog_id", ifLogged, db.likeBlog, db.recountLike);
+app.get("/cancel_like/:blog_id", ifLogged, db.cancelLikeBlog, db.recountLike);
 
 var redirectAccount = function (req, res, next) {
     res.redirect("/account");

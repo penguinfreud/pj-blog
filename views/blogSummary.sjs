@@ -62,6 +62,23 @@ exports.run = View(req, blog, type) {
         a (href=blogPath + '#comments') {
             @'评论('; @blog.comment_count; @')';
         }
+        @' | ';
+        if (req.session.user) {
+            @lib.jquery(req);
+            @lib.scriptOnce(req, '/scripts/like.js');
+            if (blog.liked) {
+                a.cancel_like (href='#', 'data-blogid'=blog.id) {
+                    @'已赞';
+                }
+            } else {
+                a.like (href='#', 'data-blogid'=blog.id) {
+                    @'赞';
+                }
+            }
+        } else {
+            @'赞';
+        }
+        @'('; @blog.like_count; @')';
         
         @lib.blogOperations(req, blog, ' | ');
         

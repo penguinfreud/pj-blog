@@ -1,18 +1,17 @@
 var escapeHTML = require("escape-html");
 
 exports.jquery = function (req) {
-    if (!req.jquery) {
-        req.jquery = true;
-        return '<script src="/scripts/jquery-2.1.4.min.js"></script>';
-    } else {
-        return '';
-    }
+    return exports.scriptOnce(req, '/scripts/jquery-2.1.4.min.js');
 };
 
-exports.del = function (req) {
-    if (!req.deleteJS) {
-        req.deleteJS = true;
-        return '<script src="/scripts/delete.js"></script>';
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+exports.scriptOnce = function (req, src) {
+    if (!req.scripts) {
+        req.scripts = {};
+    }
+    if (!hasOwnProperty.call(req.scripts, src)) {
+        req.scripts[src] = 1;
+        return '<script src="' + src + '"></script>';
     } else {
         return '';
     }
@@ -94,7 +93,7 @@ exports.blogOperations = View(req, blog, separator) {
             @separator;
         }
         @exports.jquery(req);
-        @exports.del(req);
+        @exports.scriptOnce(req, '/scripts/delete.js');
         a.del (href='/blog/' + blog.uid + "/delete/" + blog.id + "?goto=" + req.url,
             'data-obj'='《' + blog.title + '》') {
             @'删除';

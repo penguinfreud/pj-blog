@@ -6,7 +6,7 @@ exports.run = View(req) {
     var body = @{
         @lib.style('/css/blog.css');
         @lib.jquery(req);
-        @lib.del(req);
+        @lib.scriptOnce(req, '/scripts/delete.js');
         @lib.script('/scripts/blog.js');
         @lib.script('/scripts/validate.js');
         div#articlelist.panel {

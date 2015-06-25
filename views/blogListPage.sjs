@@ -5,7 +5,7 @@ exports.run = View(req, type) {
     var path = '/blog/' + req.user.id;
     var body = @{
         @lib.jquery(req);
-        @lib.del(req);
+        @lib.scriptOnce(req, '/scripts/delete.js');
         a#post_blog.align_right (href='/edit') {
             @'发博文';
         }

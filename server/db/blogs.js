@@ -41,11 +41,13 @@ db.getBlogs = function (options) {
                 if (rows.length === 0) {
                     next();
                 } else {
-                    rows.forEach(getBlogTags({
+                    var context = {
                         total: rows.length,
                         count: 0,
                         next: next
-                    }));
+                    };
+                    rows.forEach(getBlogTags(context));
+                    rows.forEach(likeOrNot(req, context));
                 }
             }
         });
@@ -66,6 +68,25 @@ var getBlogTags = function (context) {
             }
         });
     };
+};
+
+var likeOrNot = function (req, context) {
+    if (req.session.user) {
+        context.total += context.total;
+        return function (blog) {
+            conn.query("select count(*) as c from likes where uid=? and blog_id=?",
+                [req.session.user.id, blog.id], function (err, rows) {
+                    if (err) {
+                        context.next(err);
+                    } else {
+                        blog.liked = rows[0].c === 1;
+                        if (++context.count === context.total) {
+                            context.next();
+                        }
+                    }
+                });
+        };
+    }
 };
 
 db.getAuthors = function (req, res, next) {
@@ -99,11 +120,13 @@ db.getSingleBlog = function (req, res, next) {
             res.status(404).send("Not Found");
         } else {
             req.blog = rows[0];
-            getBlogTags({
+            var context = {
                 total: 1,
                 count: 0,
                 next: next
-            })(rows[0]);
+            };
+            getBlogTags(context)(rows[0]);
+            likeOrNot(req, context)(rows[0]);
         }
     });
 };
