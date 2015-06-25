@@ -7,7 +7,7 @@ process.on("uncaughtException", function (err) {
     console.error(err.stack);
 });
 
-var app = express();
+var app = global.app = express();
 
 var ifUnlogged = function (req, res, next) {
     if (req.session.user) {
@@ -21,7 +21,7 @@ var ifLogged = function (req, res, next) {
     if (req.session.user) {
         next();
     } else {
-        res.redirect("/login");
+        res.redirect("/login?goto=" + req.url);
     }
 };
 
@@ -169,7 +169,7 @@ app.post("/blog/:uid/entry/:blog_id/post_comment", bodyParser,
 
 app.get("/blog/:uid/entry/:blog_id/delete_comment/:comment_id",
     ifLogged,
-    db.checkPrivil,
+    db.checkCommentPrivil,
     db.deleteComment,
     db.decComment,
     function (req, res, next) {
@@ -185,17 +185,19 @@ app.get("/delete_category/:category_id", ifLogged,
     },
     db.getDefaultCategory, db.deleteCategory);
 
+app.get("/like/:blog_id", ifLogged, db.likeBlog);
+
 var redirectAccount = function (req, res, next) {
     res.redirect("/account");
 };
 
-require("./upload").init(app);
+require("./upload");
 
 app.post("/modify_nickname", ifLogged, bodyParser, db.modifyNickname, redirectAccount);
 app.post("/modify_password", ifLogged, bodyParser, db.modifyPassword, redirectAccount);
 app.post("/modify_description", ifLogged, bodyParser, db.modifyDescription, redirectAccount);
 
-require("./account").init(app);
+require("./account");
 
 app.use(function (req, res, next) {
     res.status(404).send("<html><body><h1>404</h1><h3>您要找的页面不存在</h3></body></html>");

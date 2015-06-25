@@ -65,17 +65,35 @@ db.postComment = function (req, res, next) {
     }
 };
 
-db.checkComment = function (req, res, next) {
-    conn.query("select id from comments where id=? and blog_id=?",
-        [req.params.comment_id, req.params.blog_id], function (err, rows) {
-            if (err) {
-                next(err);
-            } else if (rows.length === 1) {
+db.checkCommentPrivil = function (req, res, next) {
+    conn.query("select uid, category from blogs where id=? and uid=?",
+    [req.params.blog_id, req.params.uid], function (err, rows) {
+        if (err) {
+            next(err);
+        } else if (rows.length === 1) {
+            if (rows[0].uid === req.session.user.id ||
+                req.session.user.type === 2) {
                 next();
             } else {
-                next(new Error("Comment does not exist"));
+                conn.query("select uid from comments where id=? and blog_id=?",
+                [req.params.comment_id, req.params.blog_id], function (err, rows) {
+                    if (err) {
+                        next(err);
+                    } else if (rows.length === 1) {
+                        if (rows[0].uid === req.session.user.id) {
+                            next();
+                        } else {
+                            next(new Error("You don't have privilege"));
+                        }
+                    } else {
+                        next(new Error("The comment does not exist"));
+                    }
+                });
             }
-        });
+        } else {
+            next(new Error("The blog does not exist"));
+        }
+    });
 };
 
 db.deleteComment = function (req, res, next) {

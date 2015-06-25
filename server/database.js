@@ -121,3 +121,4 @@ require("./db/categories");
 require("./db/comments");
 require("./db/blogs");
 require("./db/account");
+require("./db/likes");

@@ -74,6 +74,15 @@ var hasPrivil = exports.hasPrivil = function (req, blog) {
         req.session.user.type === 2? 2: 0: 0;
 };
 
+exports.hasCommentPrivil = function (req, blog, comment) {
+    if (!req.session.user) {
+        return false;
+    }
+    var uid = req.session.user.id;
+    return uid === blog.uid || uid === comment.uid ||
+        req.session.user.type === 2;
+};
+
 exports.blogOperations = View(req, blog, separator) {
     var privil = hasPrivil(req, blog);
     if (privil) {
@@ -107,11 +116,11 @@ exports.toolbar = View(req) {
                     @'我的账号';
                 }
                 @' ';
-                a (href='/logout?goto=' + req.originalUrl) {
+                a (href='/logout?goto=' + req.url) {
                     @'退出';
                 }
             } else {
-                a (href='/login') {
+                a (href='/login?goto=' + req.url) {
                     @'登录';
                 }
             }

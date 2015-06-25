@@ -12,7 +12,7 @@ db.login = function (req, res, next) {
                 next(err);
             } else if (rows.length === 1) {
                 req.session.user = rows[0];
-                res.redirect("/");
+                app.get("goto")(req, res, "/");
             } else {
                 res.send(view.render("login", "用户名或密码错误", false));
             }
@@ -49,7 +49,7 @@ db.signup = function (req, res, next) {
                             description: null,
                             icon: "default.png" 
                         };
-                        next();
+                        app.get("goto")(req, res, "/blog/" + req.session.user.id);
                     }
                 });
             }

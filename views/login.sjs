@@ -22,7 +22,7 @@ exports.run = View(msg, isSignup) {
                 div#logo {}
             }
             div#input_container {
-                form#login_form (action='/login', method='POST') {
+                form#login_form (action='#', method='POST') {
                     input (type='hidden', name='type', value='login');
                     div {
                         @'请输入您的帐号及密码';
@@ -53,7 +53,7 @@ exports.run = View(msg, isSignup) {
                         }
                     }
                 }
-                form#signup_form (action='/login#signup', method='POST') {
+                form#signup_form (action='#signup', method='POST') {
                     input (type='hidden', name='type', value='signup');
                     div {
                         @'注册新用户';
