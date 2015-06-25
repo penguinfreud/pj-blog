@@ -4,13 +4,30 @@ var conn = db.connection;
 
 var push = Array.prototype.push;
 db.getBlogs = function (options) {
+    if (!options.where) {
+        options.where = [];
+    }
+    if (!options.params) {
+        options.params = [];
+    }
+    var sort = options.sort, orderBy;
+    if (sort === "oldest") {
+        orderBy = "created_time asc";
+    } else if (sort === "most_read") {
+        orderBy = "read_count desc, created_time desc";
+    } else if (sort === "least_read") {
+        orderBy = "read_count asc, created_time desc";
+    } else {
+        orderBy = "created_time desc";
+    }
     return function (req, res, next) {
         var start = parseInt(req.query.p);
         if (!isFinite(start) || start < 0) {
             start = 0;
         }
         
-        var where = [], params = [];
+        var where = options.where.slice(),
+            params = options.params.slice();
         if (!options.allUser) {
             where.push("uid=?");
             params.push(req.params.uid);
@@ -22,12 +39,6 @@ db.getBlogs = function (options) {
         if (options.tag) {
             where.push("(?, id) in (select name, blog_id from tags)");
             params.push(req.params.tag);
-        }
-        if (options.where) {
-            push.apply(where, options.where);
-        }
-        if (options.params) {
-            push.apply(params, options.params);
         }
         if (where.length > 0) {
             where = " where " + where.join(" and ");
@@ -50,8 +61,7 @@ db.getBlogs = function (options) {
                 var sql = "select id, uid, title" +
                     (options.hasContent? ", substr(content, 1, 250) as content": "") +
                     ", created_time, category, read_count, like_count, comment_count from blogs" + where +
-                    " order by created_time desc limit ? offset ?";
-                console.log(sql, params);
+                    " order by " + orderBy + " limit ? offset ?";
                 conn.query(sql, params,
                 function (err, rows) {
                     if (err) {

@@ -76,13 +76,13 @@ exports.run = View(req) {
                         input (type='hidden', name='whole_site', value=data.wholeSite);
                         input (type='hidden', name='sort', value=data.sort);
                         div {
-                            @sortOption(data, '最多阅读', 'most_read');
-                            @' ';
-                            @sortOption(data, '最少阅读', 'least_read');
-                            @' ';
                             @sortOption(data, '最新', 'latest');
                             @' ';
                             @sortOption(data, '最旧', 'oldest');
+                            @' ';
+                            @sortOption(data, '最多阅读', 'most_read');
+                            @' ';
+                            @sortOption(data, '最少阅读', 'least_read');
                         }
                     }
                     for (var i = 0; i<req.blogs.length; i++) {

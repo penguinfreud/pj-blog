@@ -38,7 +38,8 @@ db.search = function (req, res, next) {
             hasContent: 1,
             itemsPerPage: 10,
             where: where,
-            params: params
+            params: params,
+            sort: sort
         })(req, res, next);
     } else {
         req.blogs = [];

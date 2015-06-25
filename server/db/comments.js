@@ -21,7 +21,7 @@ db.getComments = function (req, res, next) {
         } else {
             req.commentsPaging.total = rows[0].c;
             
-            conn.query("select * from comments where blog_id=? limit 50 offset ?",
+            conn.query("select * from comments where blog_id=? order by created_time desc limit 50 offset ?",
             [req.params.blog_id, start], function (err, rows) {
                 if (err) {
                     next(err);

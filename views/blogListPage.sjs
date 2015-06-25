@@ -6,8 +6,10 @@ exports.run = View(req, type) {
     var body = @{
         @lib.jquery(req);
         @lib.scriptOnce(req, '/scripts/delete.js');
-        a#post_blog.align_right (href='/edit') {
-            @'发博文';
+        if (req.session.user && req.session.user.id === parseInt(req.params.uid)) {
+            a#post_blog.align_right (href='/edit') {
+                @'发博文';
+            }
         }
         div.clear {}
         div#body_left {

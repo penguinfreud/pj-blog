@@ -5,6 +5,7 @@ exports.run = View(req) {
         div#body_left {
             @view.render("info", req);
             @view.render("categories", req);
+            @view.render("searchBox", req);
         }
         div#body_right {
             @view.render("blogSummaryList", req);

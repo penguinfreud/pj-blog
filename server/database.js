@@ -82,16 +82,19 @@ exports.checkPrivil = function (req, res, next) {
     exports.checkAuthor(req, res, next);
 };
 
+var hasOwnProperty = Object.prototype.hasOwnProperty;
 exports.addTags = function (req, res, next) {
     var tags = escapeHTML(req.body.tags).split(/\s+/g),
+        table = {},
         id = req.blogId,
-        i, l = tags.length, count = 0;
-    if (l === 0) {
-        next();
-    } else {
-        for (i = 0; i<l; i++) {
+        tag, i, l = 0, count = 0;
+    for (i = 0; i<tags.length; i++) {
+        tag = tags[i];
+        if (tag !== "" && !hasOwnProperty.call(table, tag)) {
+            table[tag] = 1;
+            l++;
             conn.execute("insert into tags (blog_id, name) values (?, ?)", 
-                [id, tags[i]], function (err, result) {
+                [id, tag], function (err, result) {
                     if (err) {
                         next(err);
                     } else if (++count === l) {
@@ -99,6 +102,9 @@ exports.addTags = function (req, res, next) {
                     }
                 });
         }
+    }
+    if (l === 0) {
+        next();
     }
 };
 

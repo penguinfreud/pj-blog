@@ -124,6 +124,10 @@ exports.toolbar = View(req) {
                     @'退出';
                 }
             } else {
+                a.f (href='/') {
+                    @'首页';
+                }
+                @' ';
                 a.f (href='/login?goto=' + req.url) {
                     @'登录';
                 }
