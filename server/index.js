@@ -41,7 +41,7 @@ app.use(express.static(__dirname + "/../public"));
 app.get("/", db.getBlogs({
         allUser: 1,
         hasContent: 1,
-        count: 10
+        itemsPerPage: 10
     }),
     [db.getAuthors, db.getBlogCategories],
     function (req, res, next) {
@@ -64,7 +64,7 @@ app.get("/blog/:uid",
     [db.getUser,
     db.getBlogs({
         hasContent: 1,
-        count: 10
+        itemsPerPage: 10
     }),
     getCategories],
 function (req, res, next) {
@@ -74,7 +74,7 @@ function (req, res, next) {
 app.get("/blog/:uid/category/:category_id",
     [db.getUser, db.getBlogs({
         hasContent: 0,
-        count: 20,
+        itemsPerPage: 20,
         category: 1
     }),
     getCategories],
@@ -84,7 +84,7 @@ function (req, res, next) {
 
 app.get("/blog/:uid/tag/:tag", [db.getUser, db.getBlogs({
         hasContent: 0,
-        count: 20,
+        itemsPerPage: 20,
         tag: 1
     }),
     getCategories],
@@ -96,11 +96,11 @@ app.get("/blog/:uid/blog_list",
     [db.getUser,
     db.getBlogs({
         hasContent: 0,
-        count: 20
+        itemsPerPage: 20
     }),
     getCategories],
 function (req, res, next) {
-    res.send(view.render("blogListPage", req));
+    res.send(view.render("blogListPage", req, 1));
 });
 
 app.get("/blog/:uid/entry/:blog_id",

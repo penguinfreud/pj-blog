@@ -61,6 +61,7 @@ exports.run = View(req, type) {
                             }
                         }
                     }
+                    @lib.pagination(req);
                 }
             }
         }

@@ -29,7 +29,7 @@ exports.getUser = function (req, res, next) {
 
 exports.getBlogs = function (options) {
     return function (req, res, next) {
-        var start = parseInt(req.query.start);
+        var start = parseInt(req.query.p);
         if (!isFinite(start) || start < 0) {
             start = 0;
         }
@@ -51,7 +51,8 @@ exports.getBlogs = function (options) {
         if (where.length > 0) {
             where = " where " + where.join(" and ");
         }
-        params.push(options.count, start);
+        params.push(options.itemsPerPage, start);
+        req.itemsPerPage = options.itemsPerPage;
         
         conn.query("select id, uid, title" +
             (options.hasContent? ", substr(content, 1, 250) as content": "") +
@@ -261,7 +262,7 @@ exports.increaseReadCount = function (req, res, next) {
 };
 
 exports.getPrevBlog = function (req, res, next) {
-    conn.query("select id, title from blogs where created_time<? and uid=? order by created_time asc limit 1",
+    conn.query("select id, title from blogs where created_time<? and uid=? order by created_time desc limit 1",
         [req.blog.created_time, req.params.uid], function (err, rows) {
             if (err) {
                 next(err);
@@ -275,7 +276,7 @@ exports.getPrevBlog = function (req, res, next) {
 };
 
 exports.getNextBlog = function (req, res, next) {
-    conn.query("select id, title from blogs where created_time>? and uid=? order by created_time desc limit 1",
+    conn.query("select id, title from blogs where created_time>? and uid=? order by created_time asc limit 1",
         [req.blog.created_time, req.params.uid], function (err, rows) {
             if (err) {
                 next(err);

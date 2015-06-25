@@ -101,3 +101,27 @@ exports.toolbar = View(req) {
         }
     }
 };
+
+exports.pagination = View(req) {
+    div {
+        if (req.start > 0) {
+            a (href='?p=' + Math.max(req.start - req.itemsPerPage, 0)) {
+                @'&lt;前页';
+            }
+        } else {
+            span.disabled {
+                @'&lt;前页';
+            }
+        }
+        @' ';
+        if (req.blogs.length === req.itemsPerPage) {
+            a (href='?p=' + (req.start + req.itemsPerPage)) {
+                @'后页&gt;';
+            }
+        } else {
+            span.disabled {
+                @'后页&gt;';
+            }
+        }
+    }
+};

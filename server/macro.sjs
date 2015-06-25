@@ -64,6 +64,11 @@ macro stmt {
         if $a { $b ... } else { $c }
     }
     rule {
+        if $a { $b:stmt ... } else { $c:stmt ... }
+    } => {
+        if $a { $b ... } else { $c ... }
+    }
+    rule {
         if $a { $b:stmt ... }
     } => {
         if $a { $b ... }
